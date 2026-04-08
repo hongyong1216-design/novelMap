@@ -1,0 +1,58 @@
+.novel-section {
+  width: 100%;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: clamp(1rem, 2vw, 1.5rem);
+}
+
+.section-title {
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sort-control {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: clamp(0.74rem, 1vw, 0.85rem);
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  transition: background 0.18s;
+  user-select: none;
+}
+
+.sort-control:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sort-value {
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.novels-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
+}
+
+@media (max-width: 1100px) {
+  .novels-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .novels-grid {
+    grid-template-columns: 1fr;
+  }
+}

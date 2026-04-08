@@ -1,0 +1,208 @@
+.novel-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: clamp(0.85rem, 1.5vw, 1.25rem);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.novel-card:hover {
+  border-color: rgba(108, 92, 231, 0.4);
+  box-shadow: 0 4px 24px rgba(108, 92, 231, 0.1);
+}
+
+/* ---- Top section: cover + info ---- */
+.card-top {
+  display: flex;
+  gap: clamp(0.7rem, 1.5vw, 1rem);
+  margin-bottom: 1rem;
+}
+
+.book-cover {
+  width: clamp(58px, 7vw, 80px);
+  height: clamp(78px, 9.5vw, 107px);
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0.4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.book-cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 35%, rgba(0, 0, 0, 0.65));
+}
+
+.book-cover-title {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(0.52rem, 0.75vw, 0.68rem);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  text-align: center;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+}
+
+.card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.field-label {
+  font-size: 0.67rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 0.1rem;
+}
+
+.card-title {
+  font-size: clamp(0.88rem, 1.2vw, 1.05rem);
+  font-weight: 600;
+  margin-bottom: 0.55rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-meta-row {
+  font-size: clamp(0.71rem, 0.9vw, 0.8rem);
+  color: var(--text-secondary);
+  margin-bottom: 0.2rem;
+}
+
+.meta-label {
+  color: var(--text-muted);
+}
+
+/* ---- Progress ---- */
+.progress-wrapper {
+  margin-bottom: 0.6rem;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: clamp(0.69rem, 0.9vw, 0.77rem);
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+}
+
+.progress-pct {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.progress-bar {
+  height: 5px;
+  background: var(--progress-bg);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* ---- Stats ---- */
+.stats-row {
+  font-size: clamp(0.69rem, 0.85vw, 0.78rem);
+  color: var(--text-muted);
+  margin-bottom: 0.3rem;
+}
+
+.sep {
+  margin: 0 0.4rem;
+  opacity: 0.35;
+}
+
+.last-updated {
+  font-size: clamp(0.69rem, 0.85vw, 0.78rem);
+  color: var(--text-muted);
+  margin-bottom: clamp(0.75rem, 1.5vw, 1rem);
+}
+
+/* ---- Actions ---- */
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: auto;
+}
+
+.btn-continue {
+  flex: 1;
+  padding: 0.5rem 0.6rem;
+  background: rgba(108, 92, 231, 0.12);
+  border: 1px solid rgba(108, 92, 231, 0.25);
+  border-radius: 8px;
+  color: var(--accent-light);
+  font-size: clamp(0.73rem, 0.9vw, 0.83rem);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.btn-continue:hover {
+  background: rgba(108, 92, 231, 0.22);
+  border-color: rgba(108, 92, 231, 0.45);
+}
+
+.action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s;
+  flex-shrink: 0;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* ---- Footer ---- */
+.card-footer {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
+}
+
+.edit-link {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: clamp(0.71rem, 0.9vw, 0.8rem);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.18s;
+  text-decoration: none;
+}
+
+.edit-link:hover {
+  color: var(--text-secondary);
+}

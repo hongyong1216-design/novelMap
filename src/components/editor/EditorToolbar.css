@@ -1,0 +1,99 @@
+/* 编辑器工具栏 */
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  padding: 6px 16px;
+  background: #1e1e2e;
+  border-bottom: 1px solid #2a2a3e;
+  gap: 4px;
+}
+
+.toolbar-group {
+  display: flex;
+  gap: 2px;
+}
+
+.toolbar-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #888;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toolbar-btn:hover {
+  background: #3a3a5a;
+  color: #e0e0e0;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background: #3a3a5a;
+  margin: 0 6px;
+}
+
+.toolbar-select {
+  background: #1a1a2e;
+  border: 1px solid #3a3a5a;
+  color: #888;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.toolbar-select:hover {
+  border-color: #4a4a6a;
+}
+
+.toolbar-select:focus {
+  border-color: #6c5ce7;
+}
+
+.font-select {
+  width: 100px;
+}
+
+.size-select {
+  width: 65px;
+}
+
+.highlight-btn {
+  color: #fdcb6e;
+}
+
+.toolbar-right {
+  margin-left: auto;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #1a1a2e;
+  border: 1px solid #3a3a5a;
+  border-radius: 6px;
+  padding: 5px 10px;
+}
+
+.search-box input {
+  background: transparent;
+  border: none;
+  color: #e0e0e0;
+  font-size: 12px;
+  outline: none;
+  width: 100px;
+}
+
+.search-box input::placeholder {
+  color: #555;
+}

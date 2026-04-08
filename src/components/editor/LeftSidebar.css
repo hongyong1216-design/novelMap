@@ -1,0 +1,218 @@
+/* 左侧边栏 */
+.left-sidebar {
+  width: 220px;
+  background: #1e1e2e;
+  border-right: 1px solid #2a2a3e;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.left-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.left-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.left-sidebar::-webkit-scrollbar-thumb {
+  background: #3a3a5a;
+  border-radius: 2px;
+}
+
+/* 侧边栏区块 */
+.sidebar-section {
+  padding: 14px 16px;
+  border-bottom: 1px solid #2a2a3e;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #aaa;
+}
+
+.btn-more {
+  background: transparent;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.btn-more:hover {
+  background: #2a2a3e;
+  color: #888;
+}
+
+/* 项目选择器 */
+.project-label {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.project-value {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #2a2a3e;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #e0e0e0;
+}
+
+.project-value:hover {
+  background: #3a3a4e;
+}
+
+/* 角色头像 */
+.character-avatars {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.character-avatar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.character-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.character-avatar:hover {
+  transform: scale(1.08);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.character-avatar-name {
+  font-size: 10px;
+  color: #888;
+  max-width: 42px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-character-profiles {
+  width: 100%;
+  padding: 7px 12px;
+  background: #2a2a3e;
+  border: none;
+  border-radius: 6px;
+  color: #888;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-character-profiles:hover {
+  background: #3a3a4e;
+  color: #e0e0e0;
+}
+
+/* 世界地图 */
+.world-map {
+  display: flex;
+  flex-direction: column;
+}
+
+.map-image {
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.map-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.map-label {
+  text-align: center;
+  font-size: 11px;
+  color: #777;
+}
+
+/* 故事面板 - 2列网格 */
+.story-panels-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.story-panel {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.story-panel.active .panel-thumbnail {
+  box-shadow: 0 0 0 2px #6c5ce7;
+}
+
+.story-panel.active .panel-title {
+  color: #a29bfe;
+}
+
+.panel-thumbnail {
+  width: 100%;
+  aspect-ratio: 4/3;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  transition: all 0.2s;
+}
+
+.story-panel:hover .panel-thumbnail {
+  transform: scale(1.03);
+  filter: brightness(1.15);
+}
+
+.panel-placeholder {
+  font-size: 20px;
+  opacity: 0.5;
+}
+
+.panel-title {
+  font-size: 10px;
+  color: #666;
+  text-align: center;
+  font-weight: 500;
+}

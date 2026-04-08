@@ -1,0 +1,454 @@
+/* 地图编辑器整体布局 */
+.map-editor {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  background: #1a1a2e;
+}
+
+/* ===== 顶部工具栏 ===== */
+.map-toolbar {
+  display: flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: #16162a;
+  border-bottom: 1px solid #2a2a3e;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.map-tool-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #888;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.map-tool-btn:hover {
+  background: #2a2a3e;
+  color: #ccc;
+}
+
+.map-tool-btn.active {
+  background: #3a3a5a;
+  color: #7c6cf0;
+}
+
+.tool-label {
+  font-size: 11px;
+}
+
+.map-toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background: #3a3a5a;
+  margin: 0 6px;
+}
+
+/* ===== 主体三栏 ===== */
+.map-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ===== 左侧面板 ===== */
+.map-left-panel {
+  width: 230px;
+  background: #1e1e2e;
+  border-right: 1px solid #2a2a3e;
+  overflow-y: auto;
+  flex-shrink: 0;
+  padding: 12px;
+}
+
+.map-left-panel::-webkit-scrollbar {
+  width: 4px;
+}
+.map-left-panel::-webkit-scrollbar-thumb {
+  background: #3a3a5a;
+  border-radius: 2px;
+}
+
+.map-panel-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ccc;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 14px 0;
+}
+
+.element-section {
+  margin-bottom: 16px;
+}
+
+.element-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 8px 0;
+}
+
+.element-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.element-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  background: #252542;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+}
+
+.element-item:hover {
+  background: #3a3a5a;
+  border-color: #4a4a6a;
+}
+
+.element-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.element-label {
+  font-size: 9px;
+  color: #888;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ===== 中央画布 ===== */
+.map-canvas-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.map-tab-bar {
+  display: flex;
+  background: #16162a;
+  border-bottom: 1px solid #2a2a3e;
+  padding: 0 8px;
+  flex-shrink: 0;
+}
+
+.map-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: #252542;
+  color: #aaa;
+  font-size: 11px;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  margin-top: 4px;
+  border: 1px solid #2a2a3e;
+  border-bottom: 1px solid #252542;
+}
+
+.map-tab.active {
+  background: #1a1a2e;
+  color: #e0e0e0;
+  border-bottom-color: #1a1a2e;
+}
+
+.map-tab-close {
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.map-tab-close:hover {
+  color: #e74c3c;
+}
+
+.map-canvas {
+  flex: 1;
+  overflow: hidden;
+  cursor: crosshair;
+  position: relative;
+  background: #0d2a3a;
+}
+
+.map-svg-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.map-statusbar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 4px 12px;
+  background: #16162a;
+  border-top: 1px solid #2a2a3e;
+  font-size: 11px;
+  color: #666;
+  flex-shrink: 0;
+}
+
+/* ===== 右侧面板 ===== */
+.map-right-panel {
+  width: 260px;
+  background: #1e1e2e;
+  border-left: 1px solid #2a2a3e;
+  overflow-y: auto;
+  flex-shrink: 0;
+  padding: 12px;
+}
+
+.map-right-panel::-webkit-scrollbar {
+  width: 4px;
+}
+.map-right-panel::-webkit-scrollbar-thumb {
+  background: #3a3a5a;
+  border-radius: 2px;
+}
+
+/* 区域名称行 */
+.region-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* 区域树 */
+.region-tree {
+  margin-bottom: 12px;
+  border: 1px solid #2a2a3e;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.region-tree-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: background 0.1s;
+  font-size: 12px;
+  color: #bbb;
+  border-bottom: 1px solid #252542;
+}
+
+.region-tree-item:last-child {
+  border-bottom: none;
+}
+
+.region-tree-item:hover {
+  background: #252542;
+}
+
+.region-tree-item.selected {
+  background: #2a2a4a;
+  color: #e0e0e0;
+}
+
+.region-tree-item.child {
+  padding-left: 28px;
+  font-size: 11px;
+  color: #999;
+}
+
+.region-expand {
+  display: flex;
+  align-items: center;
+  color: #666;
+  width: 14px;
+  flex-shrink: 0;
+}
+
+.region-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.region-eye {
+  display: flex;
+  color: #555;
+  flex-shrink: 0;
+  padding: 2px;
+  border-radius: 3px;
+  transition: color 0.15s;
+}
+
+.region-eye:hover {
+  color: #aaa;
+}
+
+/* 操作按钮 */
+.region-actions {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.region-action-btn {
+  flex: 1;
+  padding: 6px 8px;
+  background: #2a2a3e;
+  border: 1px solid #3a3a5a;
+  border-radius: 5px;
+  color: #aaa;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.region-action-btn:hover {
+  background: #3a3a4e;
+  color: #e0e0e0;
+}
+
+/* 区域填充 */
+.region-fill-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 11px;
+  color: #888;
+}
+
+.color-swatches {
+  display: flex;
+  gap: 4px;
+}
+
+.color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.15s;
+}
+
+.color-swatch:hover {
+  border-color: #fff;
+}
+
+/* 属性编辑器 */
+.region-properties {
+  border-top: 1px solid #2a2a3e;
+  padding-top: 12px;
+}
+
+.prop-header {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.prop-highlight {
+  color: #7c6cf0;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.prop-group {
+  margin-bottom: 10px;
+}
+
+.prop-label {
+  display: block;
+  font-size: 10px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.prop-input {
+  width: 100%;
+  padding: 6px 8px;
+  background: #252542;
+  border: 1px solid #3a3a5a;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.prop-input:focus {
+  border-color: #6c5ce7;
+}
+
+.prop-input.small {
+  width: 80px;
+}
+
+.prop-select {
+  width: 100%;
+  padding: 6px 8px;
+  background: #252542;
+  border: 1px solid #3a3a5a;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+}
+
+.prop-color-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.prop-color-preview {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid #3a3a5a;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.prop-opacity {
+  font-size: 11px;
+  color: #888;
+  white-space: nowrap;
+}
