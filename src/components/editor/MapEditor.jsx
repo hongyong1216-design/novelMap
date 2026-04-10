@@ -4,12 +4,16 @@ import Toolbar from './map-editor/Toolbar'
 import LeftPanel from './map-editor/LeftPanel'
 import MapCanvas from './map-editor/MapCanvas'
 import RightPanel from './map-editor/RightPanel'
-import { defaultRegions } from './map-editor/data'
+import { defaultRegions, terrainBrushes, colorBrushes } from './map-editor/data'
 
 export default function MapEditor() {
   const [activeTool, setActiveTool] = useState('select')
   const [selectedRegion, setSelectedRegion] = useState('veridian')
   const [regions, setRegions] = useState(defaultRegions)
+  const [activeBrush, setActiveBrush] = useState(null)
+  const [brushSize, setBrushSize] = useState(40)
+  const [brushMode, setBrushMode] = useState('smooth')
+  const [brushStrokes, setBrushStrokes] = useState([])
   const canvasRef = useRef(null)
 
   const toggleRegionExpand = (id) => {
@@ -37,11 +41,23 @@ export default function MapEditor() {
     <div className="map-editor">
       <Toolbar activeTool={activeTool} onToolChange={handleToolChange} />
       <div className="map-body">
-        <LeftPanel />
+        <LeftPanel
+          activeBrush={activeBrush}
+          onBrushSelect={setActiveBrush}
+          brushSize={brushSize}
+          onBrushSizeChange={setBrushSize}
+          brushMode={brushMode}
+          onBrushModeChange={setBrushMode}
+        />
         <MapCanvas
           ref={canvasRef}
           selectedRegion={selectedRegion}
           onSelectRegion={setSelectedRegion}
+          activeBrush={activeBrush}
+          brushSize={brushSize}
+          brushMode={brushMode}
+          brushStrokes={brushStrokes}
+          onAddBrushStroke={(stroke) => setBrushStrokes(prev => [...prev, stroke])}
         />
         <RightPanel
           regions={regions}

@@ -1,10 +1,15 @@
 export const terrainBrushes = [
-  { id: 'mountain', label: '山脉', emoji: '⛰️' },
-  { id: 'hill', label: '丘陵', emoji: '🏔️' },
-  { id: 'forest', label: '森林', emoji: '🌲' },
-  { id: 'swamp', label: '沼泽', emoji: '🌿' },
-  { id: 'desert', label: '沙漠', emoji: '🏜️' },
-  { id: 'coastline', label: '海岸线', emoji: '🏖️' },
+  { id: 'rocky', label: '岩石', emoji: '⛰️', image: '/src/assets/area/rocky_terrain.png' },
+  { id: 'sea', label: '海水', emoji: '🌊', image: '/src/assets/area/sea_water.png' },
+]
+
+// 没有图片的地形使用纯色填充
+export const colorBrushes = [
+  { id: 'forest', label: '森林', emoji: '🌲', color: '#2d7a3a' },
+  { id: 'swamp', label: '沼泽', emoji: '🌿', color: '#5a7a3a' },
+  { id: 'desert', label: '沙漠', emoji: '🏜️', color: '#c4a44a' },
+  { id: 'snow', label: '雪地', emoji: '🏔️', color: '#e8e8f0' },
+  { id: 'lava', label: '岩浆', emoji: '🌋', color: '#c0392b' },
 ]
 
 export const waterBodies = [

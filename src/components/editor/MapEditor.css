@@ -192,9 +192,23 @@
 .map-canvas {
   flex: 1;
   overflow: hidden;
-  cursor: crosshair;
   position: relative;
   background: #0d2a3a;
+}
+
+/* 光标模式：默认 */
+.map-cursor-default {
+  cursor: default;
+}
+
+/* 光标模式：画笔 — 隐藏默认光标，用 brush-cursor 圆替代 */
+.map-cursor-brush {
+  cursor: none;
+}
+
+/* 光标模式：抓取 */
+.map-cursor-grab {
+  cursor: grab;
 }
 
 .map-svg-canvas {
@@ -451,4 +465,125 @@
   font-size: 11px;
   color: #888;
   white-space: nowrap;
+}
+
+/* 笔刷模式选择 */
+.brush-mode-section {
+  margin-bottom: 16px;
+}
+
+.brush-mode-section .element-section-title {
+  margin-bottom: 8px;
+}
+
+.brush-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.brush-mode-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  background: #252542;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+}
+
+.brush-mode-item:hover {
+  background: #3a3a5a;
+  border-color: #4a4a6a;
+}
+
+.brush-mode-item.selected {
+  background: #3a3a5a;
+  border-color: #7c6cf0;
+}
+
+.mode-icon {
+  font-size: 18px;
+  line-height: 1;
+  color: #aaa;
+}
+
+.mode-label {
+  font-size: 9px;
+  color: #888;
+}
+
+/* 笔刷选中态 */
+.element-item.selected {
+  background: #3a3a5a;
+  border-color: #7c6cf0;
+}
+
+/* 笔刷大小控制 */
+.brush-size-section {
+  margin-bottom: 16px;
+  padding: 10px;
+  background: #252542;
+  border-radius: 6px;
+  border: 1px solid #3a3a5a;
+}
+
+.brush-size-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.brush-size-value {
+  font-size: 12px;
+  color: #7c6cf0;
+  font-weight: 600;
+}
+
+.brush-size-slider {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #3a3a5a;
+  border-radius: 2px;
+  outline: none;
+}
+
+.brush-size-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #7c6cf0;
+  cursor: pointer;
+}
+
+.brush-size-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #7c6cf0;
+  cursor: pointer;
+  border: none;
+}
+
+/* 笔刷光标 — 跟随鼠标的圆圈 */
+.brush-cursor {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+  z-index: 100;
+  transform: translate(0, 0);
+}
+
+/* 拖拽时的光标 */
+.map-canvas-area:active.map-cursor-grab {
+  cursor: grabbing;
 }

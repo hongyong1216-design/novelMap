@@ -1,5 +1,8 @@
-import { useState, useRef, useLayoutEffect, useEffect, forwardRef } from 'react'
-import { Stage, Layer, Rect, Circle, Text, Line, Group } from 'react-konva'
+import { useState, useRef, useLayoutEffect, useEffect, forwardRef, useCallback } from 'react'
+import { Stage, Layer, Rect, Circle, Text, Line, Group, Shape } from 'react-konva'
+import { terrainBrushes, colorBrushes } from './data'
+import rockyImg from '../../../assets/area/rocky_terrain.png'
+import seaImg from '../../../assets/area/sea_water.png'
 
 /* ===== 地图数据定义 ===== */
 const mapRegions = [
@@ -39,6 +42,83 @@ const mapSouthIce = 'M200 1100 Q500 1070 900 1080 Q1200 1070 1600 1090 Q1700 112
 const STAGE_W = 2000
 const STAGE_H = 1200
 
+// 生成不规则路径 — 对原始点添加随机偏移 + 变宽效果
+function jitterPoints(pts, seed) {
+  const result = []
+  const jitter = 3 // 随机偏移幅度
+  for (let i = 0; i < pts.length; i += 2) {
+    const x = pts[i] + ((Math.sin(seed + i) * 43758.5453) % 1) * jitter * 2 - jitter
+    const y = pts[i + 1] + ((Math.sin(seed + i + 1) * 23421.6312) % 1) * jitter * 2 - jitter
+    result.push(x, y)
+  }
+  return result
+}
+
+// 绘制带纹理的笔触（使用 Canvas 原生 API 保证纹理连贯）
+function drawTexturedStroke(nativeCtx, pts, texImg, size, irregular = false, seed = 0) {
+  if (pts.length < 4) return
+
+  const drawPts = irregular ? jitterPoints(pts, seed) : pts
+
+  const pattern = nativeCtx.createPattern(texImg, 'repeat')
+  if (!pattern) return
+
+  // 根据笔刷大小缩放纹理
+  const s = size / 80
+  if (pattern.setTransform) {
+    pattern.setTransform(new DOMMatrix().scaleSelf(s, s))
+  }
+
+  nativeCtx.save()
+  nativeCtx.beginPath()
+  nativeCtx.moveTo(drawPts[0], drawPts[1])
+
+  // 不规则模式：用直线连接，跳过贝塞尔平滑
+  if (irregular) {
+    for (let i = 2; i < drawPts.length - 1; i += 2) {
+      nativeCtx.lineTo(drawPts[i], drawPts[i + 1])
+    }
+    nativeCtx.lineWidth = size * 0.85
+    // 分段绘制，每段用不同透明度制造不规则感
+    nativeCtx.strokeStyle = pattern
+    nativeCtx.lineCap = 'round'
+    nativeCtx.lineJoin = 'round'
+    nativeCtx.globalAlpha = 0.85
+    nativeCtx.stroke()
+
+    // 第二层：更细的线条，更低透明度，叠加纹理
+    nativeCtx.globalAlpha = 0.4
+    nativeCtx.lineWidth = size * 0.5
+    nativeCtx.stroke()
+  } else {
+    // 平滑模式：二次贝塞尔曲线
+    if (drawPts.length === 4) {
+      nativeCtx.lineTo(drawPts[2], drawPts[3])
+    } else {
+      for (let i = 2; i < drawPts.length - 2; i += 2) {
+        const xc = (drawPts[i] + drawPts[i + 2]) / 2
+        const yc = (drawPts[i + 1] + drawPts[i + 3]) / 2
+        nativeCtx.quadraticCurveTo(drawPts[i], drawPts[i + 1], xc, yc)
+      }
+      nativeCtx.lineTo(drawPts[drawPts.length - 2], drawPts[drawPts.length - 1])
+    }
+    nativeCtx.strokeStyle = pattern
+    nativeCtx.lineWidth = size
+    nativeCtx.lineCap = 'round'
+    nativeCtx.lineJoin = 'round'
+    nativeCtx.globalAlpha = 0.9
+    nativeCtx.stroke()
+  }
+
+  nativeCtx.restore()
+}
+
+// 笔刷图片映射
+const brushImages = {
+  rocky: rockyImg,
+  sea: seaImg,
+}
+
 function parsePath(d) {
   const pts = []
   const tokens = d.replace(/([A-Za-z])/g, ' $1 ').trim().split(/\s+/)
@@ -52,19 +132,79 @@ function parsePath(d) {
   return pts
 }
 
-const MapCanvas = forwardRef(function MapCanvas({ selectedRegion, onSelectRegion, onHoverElement }, ref) {
+
+const MapCanvas = forwardRef(function MapCanvas({
+  selectedRegion, onSelectRegion, onHoverElement,
+  activeBrush, brushSize, brushMode, brushStrokes, onAddBrushStroke,
+}, ref) {
   const stageRef = useRef(null)
   const canvasContainerRef = useRef(null)
   const [containerSize, setContainerSize] = useState({ w: 800, h: 600 })
   const [pos, setPos] = useState({ x: 0, y: 0 })
+  const posRef = useRef({ x: 0, y: 0 })
   const [scale, setScale] = useState(1)
+  const scaleRef = useRef(1)
   const [hoveredId, setHoveredId] = useState(null)
+  const [spacePressed, setSpacePressed] = useState(false)
+  const [renderTick, setRenderTick] = useState(0)
 
-  // 自适应容器尺寸 — 监听外层 .map-canvas div
+  // 笔刷光标 — 使用 ref + 直接 DOM 操作，避免每帧重渲染
+  const brushCursorRef = useRef(null)
+
+  // 笔刷绘制状态
+  const isPainting = useRef(false)
+  const currentPoints = useRef([])
+  const strokeGroupRef = useRef(0)
+  const rafRef = useRef(null)
+
+  // 同步 ref 以获取最新值
+  useEffect(() => {
+    posRef.current = pos
+    scaleRef.current = scale
+  }, [pos, scale])
+
+  // 加载所有纹理图片
+  const textureImages = useRef({})
+
+  useEffect(() => {
+    Object.entries(brushImages).forEach(([id, src]) => {
+      const img = new window.Image()
+      img.crossOrigin = 'Anonymous'
+      img.onload = () => {
+        textureImages.current[id] = img
+      }
+      img.src = src
+    })
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    }
+  }, [])
+
+  // 空格键监听 — 按住空格时显示抓取光标并允许拖拽地图
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.code === 'Space' && !e.repeat) {
+        e.preventDefault()
+        setSpacePressed(true)
+      }
+    }
+    const handleKeyUp = (e) => {
+      if (e.code === 'Space') {
+        setSpacePressed(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [])
+
+  // 自适应容器尺寸
   useLayoutEffect(() => {
     const el = canvasContainerRef.current
     if (!el) return
-
     const updateSize = () => {
       const w = el.offsetWidth
       const h = el.offsetHeight
@@ -75,13 +215,87 @@ const MapCanvas = forwardRef(function MapCanvas({ selectedRegion, onSelectRegion
         setPos({ x: (w - STAGE_W * s) / 2, y: (h - STAGE_H * s) / 2 })
       }
     }
-
     updateSize()
-
     const observer = new ResizeObserver(updateSize)
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
+
+  // 屏幕坐标转画布坐标
+  const getCanvasPoint = useCallback((clientX, clientY) => {
+    const el = canvasContainerRef.current
+    if (!el) return { x: 0, y: 0 }
+    const rect = el.getBoundingClientRect()
+    return {
+      x: (clientX - rect.left - posRef.current.x) / scaleRef.current,
+      y: (clientY - rect.top - posRef.current.y) / scaleRef.current,
+    }
+  }, [])
+
+  // 笔刷事件处理 — 收集路径点
+  const handleBrushStart = useCallback((e) => {
+    if (!activeBrush || spacePressed) return
+    e.evt.preventDefault()
+    isPainting.current = true
+    strokeGroupRef.current = Date.now()
+    const point = getCanvasPoint(e.evt.clientX, e.evt.clientY)
+    currentPoints.current = [point.x, point.y]
+  }, [activeBrush, spacePressed, getCanvasPoint])
+
+  const handleBrushMove = useCallback((e) => {
+    if (!isPainting.current || !activeBrush || spacePressed) return
+    const point = getCanvasPoint(e.evt.clientX, e.evt.clientY)
+    const pts = currentPoints.current
+    if (pts.length >= 2) {
+      const lastX = pts[pts.length - 2]
+      const lastY = pts[pts.length - 1]
+      const dx = point.x - lastX
+      const dy = point.y - lastY
+      const dist = Math.sqrt(dx * dx + dy * dy)
+      if (dist < 2) return
+      if (dist > 20) {
+        const steps = Math.ceil(dist / 10)
+        for (let s = 1; s <= steps; s++) {
+          const t = s / steps
+          pts.push(lastX + dx * t, lastY + dy * t)
+        }
+      } else {
+        pts.push(point.x, point.y)
+      }
+    } else {
+      pts.push(point.x, point.y)
+    }
+    // 用 rAF 节流触发重渲染，使预览线实时刷新
+    if (!rafRef.current) {
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null
+        setRenderTick(c => c + 1)
+      })
+    }
+  }, [activeBrush, spacePressed, brushSize, getCanvasPoint])
+
+  const handleBrushEnd = useCallback(() => {
+    if (!isPainting.current || !activeBrush) {
+      isPainting.current = false
+      return
+    }
+    isPainting.current = false
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current)
+      rafRef.current = null
+    }
+    if (currentPoints.current.length >= 2) {
+      onAddBrushStroke({
+        id: `stroke_${strokeGroupRef.current}`,
+        points: [...currentPoints.current],
+        brushId: activeBrush,
+        brushSize,
+        brushMode,
+      })
+    }
+    currentPoints.current = []
+    setRenderTick(c => c + 1)
+  }, [activeBrush, brushSize, onAddBrushStroke])
 
   const handleWheel = (e) => {
     e.evt.preventDefault()
@@ -126,13 +340,19 @@ const MapCanvas = forwardRef(function MapCanvas({ selectedRegion, onSelectRegion
     setPos({ x: center.x - mousePointTo.x * ns, y: center.y - mousePointTo.y * ns })
   }
 
-  // 暴露缩放方法给父组件
+  // 暴露缩放方法
   useEffect(() => {
     if (stageRef.current) {
       stageRef.current._zoomIn = zoomIn
       stageRef.current._zoomOut = zoomOut
     }
   })
+
+  const stageDraggable = !activeBrush || spacePressed
+  const colorBrush = colorBrushes.find(b => b.id === activeBrush)
+
+  // 判断当前光标类型
+  const cursorMode = spacePressed ? 'grab' : activeBrush ? 'brush' : 'default'
 
   return (
     <div className="map-canvas-area">
@@ -141,7 +361,27 @@ const MapCanvas = forwardRef(function MapCanvas({ selectedRegion, onSelectRegion
           阿瑟加德地图 <span className="map-tab-close">×</span>
         </div>
       </div>
-      <div className="map-canvas" ref={canvasContainerRef}>
+      <div
+        className={`map-canvas map-cursor-${cursorMode}`}
+        ref={canvasContainerRef}
+        onMouseMove={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect()
+          const mx = e.clientX - rect.left
+          const my = e.clientY - rect.top
+          // 直接操作 DOM 更新笔刷光标，避免 React 重渲染
+          const cursorEl = brushCursorRef.current
+          if (cursorEl && activeBrush && !spacePressed) {
+            cursorEl.style.left = (mx - brushSize / 2) + 'px'
+            cursorEl.style.top = (my - brushSize / 2) + 'px'
+            cursorEl.style.display = 'block'
+          }
+        }}
+        onMouseLeave={() => {
+          if (brushCursorRef.current) {
+            brushCursorRef.current.style.display = 'none'
+          }
+        }}
+      >
         <Stage
           ref={stageRef}
           width={containerSize.w}
@@ -151,9 +391,14 @@ const MapCanvas = forwardRef(function MapCanvas({ selectedRegion, onSelectRegion
           x={pos.x}
           y={pos.y}
           onWheel={handleWheel}
-          draggable
+          draggable={stageDraggable}
           onDragEnd={handleDragEnd}
+          onMouseDown={handleBrushStart}
+          onMouseMove={handleBrushMove}
+          onMouseUp={handleBrushEnd}
+          onMouseLeave={handleBrushEnd}
           onTap={(e) => {
+            if (activeBrush) return
             const target = e.target
             const id = target.attrs.dataId
             if (id && mapRegions.find(r => r.id === id)) {
@@ -161,11 +406,9 @@ const MapCanvas = forwardRef(function MapCanvas({ selectedRegion, onSelectRegion
             }
           }}
         >
+          {/* ===== 底层：地图 ===== */}
           <Layer>
-            {/* 背景 */}
             <Rect x={-5000} y={-5000} width={12000} height={12000} fill="#0d2a3a" />
-
-            {/* 渐变定义用 Rect 模拟 */}
             <Rect x={0} y={0} width={STAGE_W} height={STAGE_H} fillLinearGradientStartPoint={{x:0,y:0}} fillLinearGradientEndPoint={{x:0,y:STAGE_H}} fillLinearGradientColorStops={[0, '#1a4a6a', 1, '#0d2a3a']} />
 
             {/* 网格线 */}
@@ -184,23 +427,19 @@ const MapCanvas = forwardRef(function MapCanvas({ selectedRegion, onSelectRegion
               if (points.length < 2) return null
               const isSelected = selectedRegion === region.id
               const isHovered = hoveredId === region.id
-
-              // 将路径点转为 Line 的 points
               const linePoints = points.flatMap(p => p)
               return (
                 <Group key={region.id}>
-                  {/* 填充 */}
                   <Line
                     points={linePoints}
                     closed
                     fill={isSelected ? '#6aaa4f' : region.fill === 'url(#landGrad1)' ? '#4a8c3f' : '#5a9a4a'}
                     opacity={isHovered ? 0.9 : 0.85}
                     dataId={region.id}
-                    onClick={() => onSelectRegion(region.id)}
+                    onClick={() => !activeBrush && onSelectRegion(region.id)}
                     onMouseEnter={() => { setHoveredId(region.id); onHoverElement?.(region.name) }}
                     onMouseLeave={() => { setHoveredId(null); onHoverElement?.(null) }}
                   />
-                  {/* 边框 */}
                   <Line
                     points={linePoints}
                     closed
@@ -209,11 +448,10 @@ const MapCanvas = forwardRef(function MapCanvas({ selectedRegion, onSelectRegion
                     strokeWidth={isSelected ? 3 : 2}
                     dash={isSelected ? [10, 5] : undefined}
                     dataId={region.id}
-                    onClick={() => onSelectRegion(region.id)}
+                    onClick={() => !activeBrush && onSelectRegion(region.id)}
                     onMouseEnter={() => { setHoveredId(region.id); onHoverElement?.(region.name) }}
                     onMouseLeave={() => { setHoveredId(null); onHoverElement?.(null) }}
                   />
-                  {/* 名称 */}
                   {region.center && (
                     <Text
                       x={region.center[0] - 30}
@@ -230,7 +468,6 @@ const MapCanvas = forwardRef(function MapCanvas({ selectedRegion, onSelectRegion
               )
             })}
 
-            {/* 特殊地貌 */}
             {/* 沙漠 */}
             <Line points={parsePath(mapDesert).flatMap(p => p)} closed fill="#c4a44a" stroke="#aa8a3a" strokeWidth={1} opacity={0.8} />
             <Text x={620} y={545} text="大荒漠" fontSize={14} fill="#8a6a2a" fontFamily="sans-serif" />
@@ -265,24 +502,8 @@ const MapCanvas = forwardRef(function MapCanvas({ selectedRegion, onSelectRegion
             {/* 城市标记 */}
             {mapCities.map(city => (
               <Group key={city.id}>
-                <Circle
-                  x={city.x}
-                  y={city.y}
-                  radius={city.size}
-                  fill={city.color}
-                  stroke="#333"
-                  strokeWidth={city.size > 5 ? 2 : 1.5}
-                />
-                <Text
-                  x={city.x}
-                  y={city.y + city.size + 10}
-                  text={city.name}
-                  fontSize={city.size > 5 ? 18 : 14}
-                  fontFamily="sans-serif"
-                  fill={city.color}
-                  align="center"
-                  offsetX={30}
-                />
+                <Circle x={city.x} y={city.y} radius={city.size} fill={city.color} stroke="#333" strokeWidth={city.size > 5 ? 2 : 1.5} />
+                <Text x={city.x} y={city.y + city.size + 10} text={city.name} fontSize={city.size > 5 ? 18 : 14} fontFamily="sans-serif" fill={city.color} align="center" offsetX={30} />
               </Group>
             ))}
 
@@ -293,19 +514,9 @@ const MapCanvas = forwardRef(function MapCanvas({ selectedRegion, onSelectRegion
             <Text x={920} y={885} text="南方深海" fontSize={18} fontStyle="italic" fill="#2a5a8a" opacity={0.5} fontFamily="sans-serif" />
 
             {/* 标题 */}
-            <Text
-              x={STAGE_W / 2}
-              y={50}
-              text="阿瑟加德大陆全图"
-              fontSize={32}
-              fontFamily="sans-serif"
-              fontWeight="bold"
-              fill="#d4c8a0"
-              align="center"
-              offsetX={120}
-            />
+            <Text x={STAGE_W / 2} y={50} text="阿瑟加德大陆全图" fontSize={32} fontFamily="sans-serif" fontWeight="bold" fill="#d4c8a0" align="center" offsetX={120} />
 
-            {/* 简易罗盘 */}
+            {/* 罗盘 */}
             <Group x={250} y={950}>
               <Circle r={40} fill="rgba(0,0,0,0.3)" stroke="#c4a44a" strokeWidth={2} />
               <Line points={[0, -35, 0, 35]} stroke="#c4a44a" strokeWidth={1} />
@@ -324,19 +535,106 @@ const MapCanvas = forwardRef(function MapCanvas({ selectedRegion, onSelectRegion
               <Rect x={40} y={55} width={55} height={30} rx={2} fill="#3a6a2a" opacity={0.6} />
               <Rect x={120} y={60} width={30} height={20} rx={2} fill="#3a6a2a" opacity={0.6} />
               <Rect x={20} y={95} width={160} height={15} rx={1} fill="#9aa8b0" opacity={0.3} />
-              {/* 视口框 */}
               <Rect x={15} y={5} width={80} height={50} rx={1} fill="none" stroke="#fff" strokeWidth={1.5} />
             </Group>
           </Layer>
+
+          {/* ===== 顶层：笔刷图层 ===== */}
+          <Layer listening={false}>
+            {brushStrokes.map(stroke => {
+              const isTex = brushImages[stroke.brushId] !== undefined
+              const cb = colorBrushes.find(b => b.id === stroke.brushId)
+              const texImg = textureImages.current[stroke.brushId]
+
+              if (isTex && texImg) {
+                const isIrreg = stroke.brushMode === 'irregular'
+                const seed = Number.parseInt(stroke.id.split('_')[1] || '0', 10)
+                return (
+                  <Shape
+                    key={stroke.id}
+                    sceneFunc={(context) => {
+                      drawTexturedStroke(context._context, stroke.points, texImg, stroke.brushSize, isIrreg, seed)
+                    }}
+                  />
+                )
+              }
+              // 纯色笔刷 / 纹理未加载时的占位
+              return (
+                <Line
+                  key={stroke.id}
+                  points={stroke.points}
+                  stroke={cb?.color || '#888'}
+                  strokeWidth={stroke.brushSize}
+                  lineCap="round"
+                  lineJoin="round"
+                  tension={stroke.brushMode === 'irregular' ? 0 : 0.3}
+                  opacity={0.85}
+                />
+              )
+            })}
+
+            {/* 正在绘制的预览线 */}
+            {isPainting.current && currentPoints.current.length >= 2 && (
+              (() => {
+                const isTex = brushImages[activeBrush] !== undefined
+                const cb = colorBrushes.find(b => b.id === activeBrush)
+                const texImg = textureImages.current[activeBrush]
+                if (isTex && texImg) {
+                  return (
+                    <Shape
+                      key="preview"
+                      sceneFunc={(context) => {
+                        drawTexturedStroke(context._context, currentPoints.current, texImg, brushSize, brushMode === 'irregular', Date.now())
+                      }}
+                    />
+                  )
+                }
+                return (
+                  <Line
+                    key="preview"
+                    points={currentPoints.current}
+                    stroke={cb?.color || '#4a8c3f'}
+                    strokeWidth={brushSize}
+                    lineCap="round"
+                    lineJoin="round"
+                    tension={brushMode === 'irregular' ? 0 : 0.3}
+                    opacity={0.85}
+                  />
+                )
+              })()
+            )}
+          </Layer>
         </Stage>
+
+        {/* 笔刷光标 — 直接 DOM 更新 */}
+        {activeBrush && (
+          <div
+            ref={brushCursorRef}
+            className="brush-cursor"
+            style={{
+              display: 'none',
+              width: brushSize,
+              height: brushSize,
+            }}
+          />
+        )}
       </div>
 
       {/* 底部状态栏 */}
       <div className="map-statusbar">
         <span>缩放: {Math.round(scale * 100)}%</span>
-        <span>X: {Math.round((pos.x) / scale * -1 + 500)}, Y: {Math.round((pos.y) / scale * -1 + 300)}</span>
-        <span>点击区域可选中</span>
-        <span>滚轮缩放 · 拖拽平移</span>
+        {activeBrush && (
+          <>
+            <span style={{ color: '#7c6cf0' }}>笔刷: {terrainBrushes.find(b => b.id === activeBrush)?.label || colorBrushes.find(b => b.id === activeBrush)?.label || activeBrush}</span>
+            <span>按住鼠标拖拽绘制</span>
+          </>
+        )}
+        {!activeBrush && (
+          <>
+            <span>点击区域可选中</span>
+            <span>滚轮缩放 · 拖拽平移</span>
+          </>
+        )}
       </div>
     </div>
   )
