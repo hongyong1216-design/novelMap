@@ -587,3 +587,38 @@
 .map-canvas-area:active.map-cursor-grab {
   cursor: grabbing;
 }
+
+/* 编辑器模式切换 */
+.editor-mode-toggle {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  display: flex;
+  gap: 4px;
+  background: #16162a;
+  border: 1px solid #2a2a3e;
+  border-radius: 8px;
+  padding: 4px;
+  z-index: 1000;
+}
+
+.mode-btn {
+  padding: 6px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  color: #888;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mode-btn:hover {
+  background: #2a2a3e;
+  color: #ccc;
+}
+
+.mode-btn.active {
+  background: #3a3a5a;
+  color: #7c6cf0;
+}

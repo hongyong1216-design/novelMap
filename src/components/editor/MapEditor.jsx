@@ -4,6 +4,7 @@ import Toolbar from './map-editor/Toolbar'
 import LeftPanel from './map-editor/LeftPanel'
 import MapCanvas from './map-editor/MapCanvas'
 import RightPanel from './map-editor/RightPanel'
+import TilemapCanvas from './map-editor/TilemapCanvas'
 import { defaultRegions, terrainBrushes, colorBrushes } from './map-editor/data'
 
 export default function MapEditor() {
@@ -14,6 +15,7 @@ export default function MapEditor() {
   const [brushSize, setBrushSize] = useState(40)
   const [brushMode, setBrushMode] = useState('smooth')
   const [brushStrokes, setBrushStrokes] = useState([])
+  const [editorMode, setEditorMode] = useState('konva') // 'konva' | 'tilemap'
   const canvasRef = useRef(null)
 
   const toggleRegionExpand = (id) => {
@@ -41,31 +43,52 @@ export default function MapEditor() {
     <div className="map-editor">
       <Toolbar activeTool={activeTool} onToolChange={handleToolChange} />
       <div className="map-body">
-        <LeftPanel
-          activeBrush={activeBrush}
-          onBrushSelect={setActiveBrush}
-          brushSize={brushSize}
-          onBrushSizeChange={setBrushSize}
-          brushMode={brushMode}
-          onBrushModeChange={setBrushMode}
-        />
-        <MapCanvas
-          ref={canvasRef}
-          selectedRegion={selectedRegion}
-          onSelectRegion={setSelectedRegion}
-          activeBrush={activeBrush}
-          brushSize={brushSize}
-          brushMode={brushMode}
-          brushStrokes={brushStrokes}
-          onAddBrushStroke={(stroke) => setBrushStrokes(prev => [...prev, stroke])}
-        />
-        <RightPanel
-          regions={regions}
-          selectedRegion={selectedRegion}
-          onSelectRegion={setSelectedRegion}
-          onToggleExpand={toggleRegionExpand}
-          onToggleVisibility={toggleVisibility}
-        />
+        {editorMode === 'tilemap' ? (
+          <TilemapCanvas />
+        ) : (
+          <>
+            <LeftPanel
+              activeBrush={activeBrush}
+              onBrushSelect={setActiveBrush}
+              brushSize={brushSize}
+              onBrushSizeChange={setBrushSize}
+              brushMode={brushMode}
+              onBrushModeChange={setBrushMode}
+            />
+            <MapCanvas
+              ref={canvasRef}
+              selectedRegion={selectedRegion}
+              onSelectRegion={setSelectedRegion}
+              activeBrush={activeBrush}
+              brushSize={brushSize}
+              brushMode={brushMode}
+              brushStrokes={brushStrokes}
+              onAddBrushStroke={(stroke) => setBrushStrokes(prev => [...prev, stroke])}
+            />
+            <RightPanel
+              regions={regions}
+              selectedRegion={selectedRegion}
+              onSelectRegion={setSelectedRegion}
+              onToggleExpand={toggleRegionExpand}
+              onToggleVisibility={toggleVisibility}
+            />
+          </>
+        )}
+      </div>
+      {/* 编辑器模式切换按钮 */}
+      <div className="editor-mode-toggle">
+        <button
+          className={`mode-btn ${editorMode === 'konva' ? 'active' : ''}`}
+          onClick={() => setEditorMode('konva')}
+        >
+          矢量编辑
+        </button>
+        <button
+          className={`mode-btn ${editorMode === 'tilemap' ? 'active' : ''}`}
+          onClick={() => setEditorMode('tilemap')}
+        >
+          瓦片地图
+        </button>
       </div>
     </div>
   )
