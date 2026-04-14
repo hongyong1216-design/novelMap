@@ -1,11 +1,11 @@
 /**
  * Tileset 配置文件
- * 由 process-tileset-v2.js 自动生成
- * 生成时间: 2026/4/13 17:48:48
+ * 由 process-tileset-v3.js 自动生成
+ * 生成时间: 2026/4/14 13:55:18
  */
 
-const TILE_WIDTH = 490
-const TILE_HEIGHT = 324
+const TILE_WIDTH = 128
+const TILE_HEIGHT = 128
 const GRID_COLS = 5
 const GRID_ROWS = 4
 

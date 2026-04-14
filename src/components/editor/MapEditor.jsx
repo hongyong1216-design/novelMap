@@ -4,7 +4,8 @@ import Toolbar from './map-editor/Toolbar'
 import LeftPanel from './map-editor/LeftPanel'
 import MapCanvas from './map-editor/MapCanvas'
 import RightPanel from './map-editor/RightPanel'
-import TilemapCanvas from './map-editor/TilemapCanvas'
+import TilemapCanvas, { createInitialMapData } from './map-editor/TilemapCanvas'
+import TilemapLeftPanel from './map-editor/TilemapLeftPanel'
 import { defaultRegions, terrainBrushes, colorBrushes } from './map-editor/data'
 
 export default function MapEditor() {
@@ -16,6 +17,9 @@ export default function MapEditor() {
   const [brushMode, setBrushMode] = useState('smooth')
   const [brushStrokes, setBrushStrokes] = useState([])
   const [editorMode, setEditorMode] = useState('konva') // 'konva' | 'tilemap'
+  const [tilemapTool, setTilemapTool] = useState('paint')
+  const [selectedTile, setSelectedTile] = useState('grass')
+  const [tilemapData, setTilemapData] = useState(createInitialMapData())
   const canvasRef = useRef(null)
 
   const toggleRegionExpand = (id) => {
@@ -44,7 +48,20 @@ export default function MapEditor() {
       <Toolbar activeTool={activeTool} onToolChange={handleToolChange} />
       <div className="map-body">
         {editorMode === 'tilemap' ? (
-          <TilemapCanvas />
+          <>
+            <TilemapLeftPanel
+              selectedTile={selectedTile}
+              onSelectTile={setSelectedTile}
+              activeTool={tilemapTool}
+              onToolChange={setTilemapTool}
+            />
+            <TilemapCanvas
+              selectedTile={selectedTile}
+              activeTool={tilemapTool}
+              mapData={tilemapData}
+              onMapDataChange={setTilemapData}
+            />
+          </>
         ) : (
           <>
             <LeftPanel

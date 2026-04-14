@@ -3,8 +3,116 @@
   height: 100%;
   overflow: hidden;
   background: #1a1a2e;
+  flex: 1;
+  min-width: 0;
 }
 
 .tilemap-canvas canvas {
   display: block;
+}
+
+/* ===== 瓦片地图左侧面板 ===== */
+.tilemap-left-panel {
+  user-select: none;
+}
+
+.tilemap-tools {
+  display: flex;
+  gap: 4px;
+}
+
+.tilemap-tool-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  background: #252542;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #888;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.15s;
+  flex: 1;
+  justify-content: center;
+}
+
+.tilemap-tool-btn:hover {
+  background: #3a3a5a;
+  border-color: #4a4a6a;
+  color: #ccc;
+}
+
+.tilemap-tool-btn.active {
+  background: #3a3a5a;
+  border-color: #7c6cf0;
+  color: #7c6cf0;
+}
+
+.tilemap-tool-btn svg {
+  flex-shrink: 0;
+}
+
+/* 分类标题 */
+.tilemap-cat-header {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tilemap-cat-header:hover {
+  color: #aaa;
+}
+
+.tilemap-cat-arrow {
+  font-size: 8px;
+  width: 10px;
+  color: #666;
+}
+
+.tilemap-cat-count {
+  margin-left: auto;
+  font-size: 9px;
+  color: #555;
+  font-weight: 400;
+}
+
+/* 瓦片网格 */
+.tilemap-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.tilemap-tile-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: #252542;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 2px solid transparent;
+  aspect-ratio: 1;
+}
+
+.tilemap-tile-item:hover {
+  background: #3a3a5a;
+  border-color: #4a4a6a;
+}
+
+.tilemap-tile-item.selected {
+  background: #3a3a5a;
+  border-color: #7c6cf0;
+}
+
+.tilemap-tile-preview {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  object-fit: contain;
+  image-rendering: pixelated;
 }
