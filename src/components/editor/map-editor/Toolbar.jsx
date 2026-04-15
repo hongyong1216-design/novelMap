@@ -14,7 +14,10 @@ const tools = [
   { id: 'measure', label: '测量', icon: <MeasureIcon /> },
 ]
 
-export default function Toolbar({ activeTool, onToolChange }) {
+// 非切换类工具（点击即执行，不保持 active 状态）
+const actionTools = new Set(['save', 'undo', 'redo', 'zoomin', 'zoomout'])
+
+export default function Toolbar({ activeTool, onToolChange, saveStatus }) {
   return (
     <div className="map-toolbar">
       {tools.map((tool, i) =>
@@ -23,12 +26,15 @@ export default function Toolbar({ activeTool, onToolChange }) {
         ) : (
           <button
             key={tool.id}
-            className={`map-tool-btn ${activeTool === tool.id ? 'active' : ''}`}
+            className={`map-tool-btn ${!actionTools.has(tool.id) && activeTool === tool.id ? 'active' : ''}`}
             onClick={() => onToolChange(tool.id)}
             title={tool.label}
           >
             {tool.icon}
             <span className="tool-label">{tool.label}</span>
+            {tool.id === 'save' && saveStatus === 'saved' && (
+              <span className="save-indicator">&#10003;</span>
+            )}
           </button>
         )
       )}

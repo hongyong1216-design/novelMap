@@ -622,3 +622,10 @@
   background: #3a3a5a;
   color: #7c6cf0;
 }
+
+/* 保存成功指示器 */
+.save-indicator {
+  color: #2ecc71;
+  font-size: 12px;
+  margin-left: 2px;
+}
