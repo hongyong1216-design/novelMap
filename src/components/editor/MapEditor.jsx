@@ -11,6 +11,14 @@ import { defaultRegions, terrainBrushes, colorBrushes } from './map-editor/data'
 const STORAGE_KEY = 'novelmap_tilemap_data'
 const MAX_HISTORY = 50
 
+// 地图大小预设
+const MAP_SIZE_PRESETS = {
+  small:  { cols: 100, rows: 100, label: '小' },
+  medium: { cols: 200, rows: 200, label: '中' },
+  large:  { cols: 400, rows: 300, label: '大' },
+}
+const MAP_MAX_SIZE = 500 // 自定义最大尺寸
+
 // 从 localStorage 加载地图数据
 function loadTilemapData() {
   try {
@@ -94,6 +102,33 @@ export default function MapEditor() {
   const handleZoomOut = useCallback(() => {
     setTileZoom(prev => Math.max(prev - 16, 16))
   }, [])
+
+  // 调整地图大小（保留已有数据）
+  const handleResizeMap = useCallback((newCols, newRows) => {
+    const clamped = {
+      cols: Math.max(5, Math.min(MAP_MAX_SIZE, newCols)),
+      rows: Math.max(5, Math.min(MAP_MAX_SIZE, newRows)),
+    }
+    if (clamped.cols === tilemapData.cols && clamped.rows === tilemapData.rows) return
+
+    undoStack.current.push(tilemapData)
+    if (undoStack.current.length > MAX_HISTORY) undoStack.current.shift()
+    redoStack.current = []
+
+    const newLayers = tilemapData.layers.map((layer, li) => {
+      const defaultVal = li === 0 ? 'grass' : ''
+      return Array.from({ length: clamped.rows }, (_, ri) =>
+        Array.from({ length: clamped.cols }, (_, ci) => {
+          if (ri < tilemapData.rows && ci < tilemapData.cols) {
+            return layer[ri][ci]
+          }
+          return defaultVal
+        })
+      )
+    })
+
+    setTilemapData({ cols: clamped.cols, rows: clamped.rows, layers: newLayers })
+  }, [tilemapData])
 
   // 吸色器回调：从画布拾取瓦片后更新 selectedTile 并切回画笔
   const handleEyedrop = useCallback((tileKey) => {
@@ -189,6 +224,11 @@ export default function MapEditor() {
               onToolChange={setTilemapTool}
               brushSize={tileBrushSize}
               onBrushSizeChange={setTileBrushSize}
+              mapCols={tilemapData.cols}
+              mapRows={tilemapData.rows}
+              onResizeMap={handleResizeMap}
+              mapSizePresets={MAP_SIZE_PRESETS}
+              mapMaxSize={MAP_MAX_SIZE}
             />
             <TilemapCanvas
               selectedTile={selectedTile}

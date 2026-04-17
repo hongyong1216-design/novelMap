@@ -35,10 +35,12 @@ const groundLabels = {
   stone: '石地',
 }
 
-export default function TilemapLeftPanel({ selectedTile, onSelectTile, activeTool, onToolChange, brushSize, onBrushSizeChange }) {
+export default function TilemapLeftPanel({ selectedTile, onSelectTile, activeTool, onToolChange, brushSize, onBrushSizeChange, mapCols, mapRows, onResizeMap, mapSizePresets, mapMaxSize }) {
   const [expandedCats, setExpandedCats] = useState(
     Object.fromEntries(tileCategories.map(c => [c.id, true]))
   )
+  const [customCols, setCustomCols] = useState('')
+  const [customRows, setCustomRows] = useState('')
 
   const toggleCategory = (id) => {
     setExpandedCats(prev => ({ ...prev, [id]: !prev[id] }))
@@ -141,6 +143,69 @@ export default function TilemapLeftPanel({ selectedTile, onSelectTile, activeToo
           ))}
         </div>
       </div>
+
+      {/* 地图大小 */}
+      {onResizeMap && mapSizePresets && (
+        <div className="element-section">
+          <h4 className="element-section-title">地图大小</h4>
+          <div className="tilemap-map-size-current">
+            当前: {mapCols} x {mapRows}
+          </div>
+          <div className="tilemap-map-size-presets">
+            {Object.entries(mapSizePresets).map(([key, preset]) => (
+              <button
+                key={key}
+                className={`tilemap-size-btn ${mapCols === preset.cols && mapRows === preset.rows ? 'active' : ''}`}
+                onClick={() => onResizeMap(preset.cols, preset.rows)}
+                title={`${preset.cols} x ${preset.rows}`}
+              >
+                {preset.label}
+                <span className="tilemap-size-dim">{preset.cols}x{preset.rows}</span>
+              </button>
+            ))}
+          </div>
+          <div className="tilemap-map-size-custom">
+            <span className="tilemap-size-custom-label">自定义</span>
+            <div className="tilemap-size-custom-inputs">
+              <input
+                type="number"
+                className="tilemap-size-input"
+                placeholder="宽"
+                min={5}
+                max={mapMaxSize}
+                value={customCols}
+                onChange={e => setCustomCols(e.target.value)}
+              />
+              <span className="tilemap-size-x">x</span>
+              <input
+                type="number"
+                className="tilemap-size-input"
+                placeholder="高"
+                min={5}
+                max={mapMaxSize}
+                value={customRows}
+                onChange={e => setCustomRows(e.target.value)}
+              />
+              <button
+                className="tilemap-size-apply-btn"
+                disabled={!customCols || !customRows}
+                onClick={() => {
+                  const c = parseInt(customCols, 10)
+                  const r = parseInt(customRows, 10)
+                  if (c > 0 && r > 0) {
+                    onResizeMap(c, r)
+                    setCustomCols('')
+                    setCustomRows('')
+                  }
+                }}
+              >
+                应用
+              </button>
+            </div>
+            <span className="tilemap-size-hint">上限 {mapMaxSize}x{mapMaxSize}，下限 5x5</span>
+          </div>
+        </div>
+      )}
 
       {/* 当前选中瓦片预览 */}
       {selectedTile && (

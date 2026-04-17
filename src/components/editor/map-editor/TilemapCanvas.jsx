@@ -1,7 +1,16 @@
-import { Tilemap, ThirdPersonCamera, ManualElement } from 'react-super-tilemap'
+import { Tilemap, ThirdPersonCamera, ManualElement, tilemapEventChannel, useThirdPersonCameraContext } from 'react-super-tilemap'
 import { spriteDefinition, TILE_WIDTH, TILE_HEIGHT, tileImages } from '../../../data/tileset-config'
 import { useRef, useCallback, useEffect, useState } from 'react'
 import './TilemapCanvas.css'
+
+// 相机位置追踪器：渲染在 ThirdPersonCamera 内部以获取相机上下文
+function CameraTracker({ cameraRef }) {
+  const { cameraPosition } = useThirdPersonCameraContext()
+  useEffect(() => {
+    cameraRef.current = cameraPosition
+  }, [cameraPosition, cameraRef])
+  return null
+}
 
 // 生成地面瓦片（带网格线）
 function generateTile(color) {
@@ -60,7 +69,10 @@ export default function TilemapCanvas({ selectedTile, activeTool, mapData, onMap
   const [selectedTilePos, setSelectedTilePos] = useState(null)
   const [measureStart, setMeasureStart] = useState(null)
   const [measureEnd, setMeasureEnd] = useState(null)
+  const [spaceHeld, setSpaceHeld] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
   const canvasRef = useRef(null)
+  const cameraRef = useRef(null)
 
   // 如果没有传入 mapData，使用初始数据
   const currentMapData = mapData || createInitialMapData()
@@ -84,14 +96,37 @@ export default function TilemapCanvas({ selectedTile, activeTool, mapData, onMap
     }
   }, [onZoomIn, onZoomOut])
 
+  // 空格键拖拽模式
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.code === 'Space' && !e.repeat) {
+        e.preventDefault()
+        setSpaceHeld(true)
+      }
+    }
+    const handleKeyUp = (e) => {
+      if (e.code === 'Space') {
+        setSpaceHeld(false)
+        setIsDragging(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [])
+
   // 获取光标样式
   const getCursorClass = () => {
+    if ((spaceHeld || activeTool === 'move') && isDragging) return 'tilemap-cursor-grabbing'
+    if (spaceHeld || activeTool === 'move') return 'tilemap-cursor-grab'
     switch (activeTool) {
       case 'paint': return 'tilemap-cursor-crosshair'
       case 'erase': return 'tilemap-cursor-crosshair'
       case 'fill': return 'tilemap-cursor-crosshair'
       case 'eyedropper': return 'tilemap-cursor-eyedropper'
-      case 'move': return 'tilemap-cursor-grab'
       case 'select': return 'tilemap-cursor-pointer'
       case 'measure': return 'tilemap-cursor-crosshair'
       default: return ''
@@ -286,35 +321,88 @@ export default function TilemapCanvas({ selectedTile, activeTool, mapData, onMap
     }
   }, [activeTool, selectedTile, currentMapData, measureStart, measureEnd, brushSize, setTileAt, setTilesAt, smartErase, floodFill, eyedrop])
 
-  // 拖拽绘制支持
+  // 用 ref 保持回调最新引用，避免 EventBus 订阅中的闭包过期问题
+  const handleTileClickRef = useRef(handleTileClick)
+  useEffect(() => { handleTileClickRef.current = handleTileClick }, [handleTileClick])
+  const activeToolRef = useRef(activeTool)
+  useEffect(() => { activeToolRef.current = activeTool }, [activeTool])
+  const spaceHeldRef = useRef(spaceHeld)
+  useEffect(() => { spaceHeldRef.current = spaceHeld }, [spaceHeld])
+  const brushSizeRef = useRef(brushSize)
+  useEffect(() => { brushSizeRef.current = brushSize }, [brushSize])
+
+  // 像素坐标转瓦片坐标（使用库内部相同的转换公式）
+  const pixelToTile = useCallback((pixelPos) => {
+    const cam = cameraRef.current
+    const canvas = canvasRef.current
+    if (!cam || !canvas) return null
+    const rect = canvas.getBoundingClientRect()
+    const tileSize = displayTileSize
+    // 相机绝对像素偏移
+    const absX = rect.width / 2 - cam.x * tileSize - tileSize / 2
+    const absY = rect.height / 2 - cam.y * tileSize - tileSize / 2
+    const col = Math.floor((pixelPos.x - absX) / tileSize)
+    const row = Math.floor((pixelPos.y - absY) / tileSize)
+    return { x: col, y: row }
+  }, [displayTileSize])
+
+  // 原生鼠标事件：追踪拖拽状态（用于光标切换）
   useEffect(() => {
-    const handleMouseUp = () => {
-      isDrawing.current = false
-      lastTile.current = null
-    }
-
-    window.addEventListener('mouseup', handleMouseUp)
-    return () => window.removeEventListener('mouseup', handleMouseUp)
-  }, [])
-
-  const handleMouseDown = useCallback((pos) => {
-    isDrawing.current = true
-    handleTileClick(pos)
-  }, [handleTileClick])
-
-  const handleTileHover = useCallback((pos) => {
-    if (!pos) return
-    const { x, y } = pos
-    setHoverTile({ x, y })
-
-    if (isDrawing.current && (activeTool === 'paint' || activeTool === 'erase')) {
-      const key = `${x}_${y}`
-      if (key !== lastTile.current) {
-        lastTile.current = key
-        handleTileClick(pos)
+    const el = canvasRef.current
+    if (!el) return
+    const handleDown = () => {
+      if (spaceHeldRef.current || activeToolRef.current === 'move') {
+        setIsDragging(true)
       }
     }
-  }, [activeTool, handleTileClick])
+    const handleUp = () => setIsDragging(false)
+    el.addEventListener('mousedown', handleDown)
+    window.addEventListener('mouseup', handleUp)
+    return () => {
+      el.removeEventListener('mousedown', handleDown)
+      window.removeEventListener('mouseup', handleUp)
+    }
+  }, [])
+
+  // 通过 EventBus 订阅鼠标事件，实现拖拽连续绘制和悬停坐标
+  useEffect(() => {
+    const cols = currentMapData.cols
+    const rows = currentMapData.rows
+    const inBounds = (pos) => pos && pos.x >= 0 && pos.y >= 0 && pos.x < cols && pos.y < rows
+
+    const unsubDown = tilemapEventChannel.on('onMouseDown', (pixelPos) => {
+      if (spaceHeldRef.current || activeToolRef.current === 'move') return
+      isDrawing.current = true
+      const tilePos = pixelToTile(pixelPos)
+      if (inBounds(tilePos)) {
+        lastTile.current = `${tilePos.x}_${tilePos.y}`
+        handleTileClickRef.current(tilePos)
+      }
+    })
+
+    const unsubMove = tilemapEventChannel.on('onMouseMove', (pixelPos) => {
+      const tilePos = pixelToTile(pixelPos)
+      if (tilePos) setHoverTile({ x: tilePos.x, y: tilePos.y })
+
+      if (!spaceHeldRef.current && isDrawing.current &&
+          (activeToolRef.current === 'paint' || activeToolRef.current === 'erase')) {
+        if (inBounds(tilePos)) {
+          const key = `${tilePos.x}_${tilePos.y}`
+          if (key !== lastTile.current) {
+            lastTile.current = key
+            handleTileClickRef.current(tilePos)
+          }
+        }
+      }
+    })
+
+    const unsubUp = tilemapEventChannel.on('onMouseUp', () => {
+      isDrawing.current = false
+      lastTile.current = null
+    })
+
+    return () => { unsubDown(); unsubMove(); unsubUp() }
+  }, [pixelToTile, currentMapData.cols, currentMapData.rows])
 
   // 计算测量距离
   const measureDistance = measureStart && measureEnd
@@ -348,16 +436,16 @@ export default function TilemapCanvas({ selectedTile, activeTool, mapData, onMap
         spriteDefinition={allSprites}
         backgroundColor="#1a3a2a"
         onSpritesLoadError={(err) => console.error('Sprites load error:', err)}
-        onTileClick={handleMouseDown}
-        onTilemapClick={handleMouseDown}
-        onTileHover={handleTileHover}
       >
         <ThirdPersonCamera
+          draggable={spaceHeld || activeTool === 'move'}
           initialCameraPosition={{
             x: Math.floor(currentMapData.cols / 2),
             y: Math.floor(currentMapData.rows / 2)
           }}
-        />
+        >
+          <CameraTracker cameraRef={cameraRef} />
+        </ThirdPersonCamera>
       </Tilemap>
 
       {/* 底部状态栏 */}
