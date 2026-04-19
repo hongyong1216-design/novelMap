@@ -30,6 +30,8 @@ function loadTilemapData() {
           Array.isArray(data.layers) && data.layers.length >= 2 &&
           data.layers[0].length === data.rows &&
           data.layers[0][0].length === data.cols) {
+        // 向后兼容：老数据没有 mountains 字段
+        if (!Array.isArray(data.mountains)) data.mountains = []
         return data
       }
     }
@@ -127,7 +129,13 @@ export default function MapEditor() {
       )
     })
 
-    setTilemapData({ cols: clamped.cols, rows: clamped.rows, layers: newLayers })
+    // 过滤掉会越界的山峰（2x2 精灵原点 + span 必须仍在界内）
+    const MOUNTAIN_SPAN = 2
+    const newMountains = (tilemapData.mountains || []).filter(m =>
+      m.x + MOUNTAIN_SPAN <= clamped.cols && m.y + MOUNTAIN_SPAN <= clamped.rows
+    )
+
+    setTilemapData({ cols: clamped.cols, rows: clamped.rows, layers: newLayers, mountains: newMountains })
   }, [tilemapData])
 
   // 吸色器回调：从画布拾取瓦片后更新 selectedTile 并切回画笔

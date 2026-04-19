@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { tileImages } from '../../../data/tileset-config'
+import { mountainImages } from '../../../data/mountains-config'
 
 const tileCategories = [
   {
     id: 'trees',
     label: '乔木',
+    source: 'tile',
     tiles: ['0_0', '0_1', '0_2', '0_3', '0_4',
             '1_0', '1_1', '1_3', '1_4',
             '3_1', '3_3', '3_4']
@@ -12,12 +14,23 @@ const tileCategories = [
   {
     id: 'bushes',
     label: '灌木',
+    source: 'tile',
     tiles: ['2_0', '2_1', '3_2']
   },
   {
     id: 'special',
     label: '特殊',
+    source: 'tile',
     tiles: ['1_2', '2_2', '2_3', '2_4', '3_0']
+  },
+  {
+    id: 'mountains',
+    label: '山峰 (2x2)',
+    source: 'mountain',
+    tiles: ['0_0', '0_1', '0_2', '0_3',
+            '1_0', '1_1', '1_2', '1_3',
+            '2_0', '2_1', '2_2', '2_3',
+            '3_0', '3_1', '3_2', '3_3']
   },
 ]
 
@@ -65,6 +78,18 @@ export default function TilemapLeftPanel({ selectedTile, onSelectTile, activeToo
           <span>{groundLabels[selectedTile]}</span>
         </div>
       )
+    }
+    // 山峰 mountain_X_Y
+    if (selectedTile.startsWith('mountain_')) {
+      const key = selectedTile.replace('mountain_', '')
+      if (mountainImages[key]) {
+        return (
+          <div className="tilemap-selected-preview">
+            <img className="tilemap-tile-preview" src={mountainImages[key]} alt={selectedTile} style={{ width: 32, height: 32 }} draggable={false} />
+            <span>{selectedTile}</span>
+          </div>
+        )
+      }
     }
     // 装饰瓦片 tile_X_Y
     const key = selectedTile.replace('tile_', '')
@@ -233,37 +258,41 @@ export default function TilemapLeftPanel({ selectedTile, onSelectTile, activeToo
         </div>
       </div>
 
-      {tileCategories.map(cat => (
-        <div className="element-section" key={cat.id}>
-          <h4
-            className="element-section-title tilemap-cat-header"
-            onClick={() => toggleCategory(cat.id)}
-          >
-            <span className="tilemap-cat-arrow">{expandedCats[cat.id] ? '▾' : '▸'}</span>
-            {cat.label}
-            <span className="tilemap-cat-count">{cat.tiles.length}</span>
-          </h4>
-          {expandedCats[cat.id] && (
-            <div className="tilemap-tile-grid">
-              {cat.tiles.map(key => (
-                <div
-                  key={key}
-                  className={`tilemap-tile-item ${selectedTile === `tile_${key}` ? 'selected' : ''}`}
-                  onClick={() => handleSelectTile(`tile_${key}`)}
-                  title={`tile_${key}`}
-                >
-                  <img
-                    className="tilemap-tile-preview"
-                    src={tileImages[key]}
-                    alt={`tile_${key}`}
-                    draggable={false}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
+      {tileCategories.map(cat => {
+        const imageMap = cat.source === 'mountain' ? mountainImages : tileImages
+        const prefix = cat.source === 'mountain' ? 'mountain_' : 'tile_'
+        return (
+          <div className="element-section" key={cat.id}>
+            <h4
+              className="element-section-title tilemap-cat-header"
+              onClick={() => toggleCategory(cat.id)}
+            >
+              <span className="tilemap-cat-arrow">{expandedCats[cat.id] ? '▾' : '▸'}</span>
+              {cat.label}
+              <span className="tilemap-cat-count">{cat.tiles.length}</span>
+            </h4>
+            {expandedCats[cat.id] && (
+              <div className="tilemap-tile-grid">
+                {cat.tiles.map(key => (
+                  <div
+                    key={key}
+                    className={`tilemap-tile-item ${selectedTile === `${prefix}${key}` ? 'selected' : ''}`}
+                    onClick={() => handleSelectTile(`${prefix}${key}`)}
+                    title={`${prefix}${key}`}
+                  >
+                    <img
+                      className="tilemap-tile-preview"
+                      src={imageMap[key]}
+                      alt={`${prefix}${key}`}
+                      draggable={false}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }

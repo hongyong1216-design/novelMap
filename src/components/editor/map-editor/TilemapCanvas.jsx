@@ -1,15 +1,137 @@
 import { Tilemap, ThirdPersonCamera, ManualElement, tilemapEventChannel, useThirdPersonCameraContext } from 'react-super-tilemap'
 import { spriteDefinition, TILE_WIDTH, TILE_HEIGHT, tileImages } from '../../../data/tileset-config'
+import { mountainImages } from '../../../data/mountains-config'
 import { useRef, useCallback, useEffect, useState } from 'react'
 import './TilemapCanvas.css'
 
+const MOUNTAIN_SPAN = 2 // 山峰占据 2x2 格
+
 // 相机位置追踪器：渲染在 ThirdPersonCamera 内部以获取相机上下文
-function CameraTracker({ cameraRef }) {
+// 同时把位置推给父组件 state，使山峰覆盖层能跟随相机移动重绘
+function CameraTracker({ cameraRef, onCameraChange }) {
   const { cameraPosition } = useThirdPersonCameraContext()
   useEffect(() => {
     cameraRef.current = cameraPosition
-  }, [cameraPosition, cameraRef])
+    if (onCameraChange) onCameraChange(cameraPosition)
+  }, [cameraPosition, cameraRef, onCameraChange])
   return null
+}
+
+// 计算画布坐标系原点与相机偏移：使用内层 canvas 元素的实际尺寸（排除状态栏）
+function getCanvasOffset(canvasRef, cameraPos, tileSize) {
+  if (!canvasRef.current || !cameraPos) return null
+  const dRect = canvasRef.current.getBoundingClientRect()
+  const canvasEl = canvasRef.current.querySelector('canvas')
+  const cRect = canvasEl ? canvasEl.getBoundingClientRect() : dRect
+  const offX = cRect.left - dRect.left
+  const offY = cRect.top - dRect.top
+  return {
+    absX: offX + cRect.width / 2 - cameraPos.x * tileSize - tileSize / 2,
+    absY: offY + cRect.height / 2 - cameraPos.y * tileSize - tileSize / 2,
+  }
+}
+
+// 山峰覆盖层：以 HTML img 形式覆盖渲染 2x2 精灵
+function MountainOverlay({ mountains, tileSize, cameraPos, canvasRef }) {
+  const off = getCanvasOffset(canvasRef, cameraPos, tileSize)
+  if (!off) return null
+  const { absX, absY } = off
+  return (
+    <div className="mountain-overlay">
+      {mountains.map((m, i) => {
+        const key = m.type.replace('mountain_', '')
+        const src = mountainImages[key]
+        if (!src) return null
+        return (
+          <img
+            key={`${m.x}_${m.y}_${i}`}
+            src={src}
+            alt={m.type}
+            draggable={false}
+            style={{
+              position: 'absolute',
+              left: absX + m.x * tileSize,
+              top: absY + m.y * tileSize,
+              width: MOUNTAIN_SPAN * tileSize,
+              height: MOUNTAIN_SPAN * tileSize,
+              pointerEvents: 'none',
+              userSelect: 'none',
+            }}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
+const GROUND_COLOR_MAP = {
+  grass: '#2d7a3a',
+  water: '#1a6b8a',
+  sand: '#c2a94e',
+  stone: '#6b6b7b',
+}
+
+// 选中瓦片的悬停虚影：跟随鼠标显示半透明预览
+function HoverPreview({ selectedTile, hoverTile, brushSize, tileSize, cameraPos, canvasRef, mapCols, mapRows }) {
+  if (!selectedTile || !hoverTile) return null
+  if (hoverTile.x < 0 || hoverTile.y < 0 || hoverTile.x >= mapCols || hoverTile.y >= mapRows) return null
+
+  const off = getCanvasOffset(canvasRef, cameraPos, tileSize)
+  if (!off) return null
+  const { absX, absY } = off
+
+  const isMountain = selectedTile.startsWith('mountain_')
+  const isTile = selectedTile.startsWith('tile_')
+  const isGround = GROUND_COLOR_MAP[selectedTile] !== undefined
+
+  // 山峰固定 2x2 预览；地面/装饰按 brushSize
+  const span = isMountain ? MOUNTAIN_SPAN : Math.max(1, brushSize || 1)
+
+  // 越界预览：部分超出地图时仍显示，便于理解
+  const left = absX + hoverTile.x * tileSize
+  const top = absY + hoverTile.y * tileSize
+
+  let content = null
+  if (isMountain) {
+    const src = mountainImages[selectedTile.replace('mountain_', '')]
+    if (src) content = <img src={src} alt="" draggable={false} style={{ width: '100%', height: '100%' }} />
+  } else if (isTile) {
+    const src = tileImages[selectedTile.replace('tile_', '')]
+    if (src) {
+      // 笔刷 >1 时平铺同一张图到每一格
+      content = (
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${span}, 1fr)`, gridTemplateRows: `repeat(${span}, 1fr)`, width: '100%', height: '100%' }}>
+          {Array.from({ length: span * span }).map((_, i) => (
+            <img key={i} src={src} alt="" draggable={false} style={{ width: '100%', height: '100%' }} />
+          ))}
+        </div>
+      )
+    }
+  } else if (isGround) {
+    content = <div style={{ width: '100%', height: '100%', background: GROUND_COLOR_MAP[selectedTile] }} />
+  }
+
+  if (!content) return null
+
+  return (
+    <div
+      className="tile-hover-preview"
+      style={{
+        position: 'absolute',
+        left,
+        top,
+        width: span * tileSize,
+        height: span * tileSize,
+        pointerEvents: 'none',
+        opacity: 0.55,
+        outline: '2px dashed rgba(255,255,255,0.75)',
+        outlineOffset: '-2px',
+        zIndex: 3,
+      }}
+    >
+      {content}
+    </div>
+  )
 }
 
 // 生成地面瓦片（带网格线）
@@ -58,6 +180,8 @@ function createInitialMapData(cols = 30, rows = 20) {
       // 图层 1: 装饰层（树木等，初始空白）
       Array.from({ length: rows }, () => Array(cols).fill('')),
     ],
+    // 多格精灵层：山峰等占 2x2 的素材，存左上角原点 + 类型
+    mountains: [],
   }
 }
 
@@ -71,11 +195,13 @@ export default function TilemapCanvas({ selectedTile, activeTool, mapData, onMap
   const [measureEnd, setMeasureEnd] = useState(null)
   const [spaceHeld, setSpaceHeld] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
+  const [cameraPos, setCameraPos] = useState(null)
   const canvasRef = useRef(null)
   const cameraRef = useRef(null)
 
   // 如果没有传入 mapData，使用初始数据
   const currentMapData = mapData || createInitialMapData()
+  const mountains = currentMapData.mountains || []
 
   // Ctrl+滚轮缩放
   useEffect(() => {
@@ -122,6 +248,10 @@ export default function TilemapCanvas({ selectedTile, activeTool, mapData, onMap
   const getCursorClass = () => {
     if ((spaceHeld || activeTool === 'move') && isDragging) return 'tilemap-cursor-grabbing'
     if (spaceHeld || activeTool === 'move') return 'tilemap-cursor-grab'
+    // 画笔 + 有选中瓦片 + 鼠标在地图内 → 隐藏系统鼠标，由虚影代替
+    const inBounds = hoverTile && hoverTile.x >= 0 && hoverTile.y >= 0 &&
+      hoverTile.x < currentMapData.cols && hoverTile.y < currentMapData.rows
+    if (activeTool === 'paint' && selectedTile && inBounds) return 'tilemap-cursor-hidden'
     switch (activeTool) {
       case 'paint': return 'tilemap-cursor-crosshair'
       case 'erase': return 'tilemap-cursor-crosshair'
@@ -181,6 +311,31 @@ export default function TilemapCanvas({ selectedTile, activeTool, mapData, onMap
     })
   }, [currentMapData, onMapDataChange])
 
+  // 查找覆盖 (x,y) 的最上层山峰索引（数组后部渲染在上），-1 表示无
+  const findMountainAt = useCallback((x, y) => {
+    for (let i = mountains.length - 1; i >= 0; i--) {
+      const m = mountains[i]
+      if (x >= m.x && x < m.x + MOUNTAIN_SPAN && y >= m.y && y < m.y + MOUNTAIN_SPAN) {
+        return i
+      }
+    }
+    return -1
+  }, [mountains])
+
+  // 放置山峰：(x,y) 作为左上角原点，需保证 2x2 区域在界内
+  // 允许与其它山峰部分重叠，但禁止完全重叠（同原点的 2x2）
+  const placeMountain = useCallback((x, y, type) => {
+    if (!onMapDataChange) return
+    if (x < 0 || y < 0 || x + MOUNTAIN_SPAN > currentMapData.cols || y + MOUNTAIN_SPAN > currentMapData.rows) return
+    for (const m of mountains) {
+      if (m.x === x && m.y === y) return // 同原点且同尺寸 → 完全重叠，拒绝
+    }
+    onMapDataChange({
+      ...currentMapData,
+      mountains: [...mountains, { x, y, type }],
+    })
+  }, [currentMapData, mountains, onMapDataChange])
+
   // BFS flood fill
   const floodFill = useCallback((startX, startY) => {
     if (!onMapDataChange || !selectedTile) return
@@ -231,9 +386,27 @@ export default function TilemapCanvas({ selectedTile, activeTool, mapData, onMap
     })
   }, [currentMapData, selectedTile, onMapDataChange])
 
-  // 智能橡皮擦：优先清除装饰层
+  // 智能橡皮擦：优先清除山峰，再清除装饰层，最后重置地面
   const smartErase = useCallback((cx, cy, size) => {
     if (!onMapDataChange) return
+
+    // 先处理山峰：只要 brush 范围内任一格被山峰覆盖就整体移除
+    const hitMountainIds = new Set()
+    for (let dy = 0; dy < size; dy++) {
+      for (let dx = 0; dx < size; dx++) {
+        const x = cx + dx, y = cy + dy
+        const idx = findMountainAt(x, y)
+        if (idx !== -1) hitMountainIds.add(idx)
+      }
+    }
+
+    if (hitMountainIds.size > 0) {
+      onMapDataChange({
+        ...currentMapData,
+        mountains: mountains.filter((_, i) => !hitMountainIds.has(i)),
+      })
+      return
+    }
 
     const newLayers = currentMapData.layers.map(l => l.map(row => [...row]))
 
@@ -257,21 +430,26 @@ export default function TilemapCanvas({ selectedTile, activeTool, mapData, onMap
       ...currentMapData,
       layers: newLayers,
     })
-  }, [currentMapData, onMapDataChange])
+  }, [currentMapData, mountains, findMountainAt, onMapDataChange])
 
   // 吸色器：拾取瓦片
   const eyedrop = useCallback((x, y) => {
     if (!onEyedrop) return
-    // 优先拾取装饰层
+    // 优先拾取山峰
+    const mIdx = findMountainAt(x, y)
+    if (mIdx !== -1) {
+      onEyedrop(mountains[mIdx].type)
+      return
+    }
+    // 装饰层
     const decor = currentMapData.layers[1]?.[y]?.[x]
     if (decor && decor !== '') {
-      // 装饰层存储的就是 tile_X_Y 格式
       onEyedrop(decor.startsWith('tile_') ? decor : `tile_${decor}`)
     } else {
       const ground = currentMapData.layers[0]?.[y]?.[x]
       if (ground) onEyedrop(ground)
     }
-  }, [currentMapData, onEyedrop])
+  }, [currentMapData, mountains, findMountainAt, onEyedrop])
 
   // 处理瓦片点击 — onTileClick 回调接收 Position { x, y }
   const handleTileClick = useCallback((pos) => {
@@ -307,19 +485,23 @@ export default function TilemapCanvas({ selectedTile, activeTool, mapData, onMap
 
     // 根据工具类型执行操作
     if (activeTool === 'paint' && selectedTile) {
-      const isGround = GROUND_TILES.includes(selectedTile)
-      const targetLayer = isGround ? 0 : 1
-      if (brushSize > 1) {
-        setTilesAt(x, y, targetLayer, selectedTile, brushSize)
+      if (selectedTile.startsWith('mountain_')) {
+        placeMountain(x, y, selectedTile)
       } else {
-        setTileAt(x, y, targetLayer, selectedTile)
+        const isGround = GROUND_TILES.includes(selectedTile)
+        const targetLayer = isGround ? 0 : 1
+        if (brushSize > 1) {
+          setTilesAt(x, y, targetLayer, selectedTile, brushSize)
+        } else {
+          setTileAt(x, y, targetLayer, selectedTile)
+        }
       }
     } else if (activeTool === 'erase') {
       smartErase(x, y, brushSize)
     } else if (activeTool === 'fill') {
       floodFill(x, y)
     }
-  }, [activeTool, selectedTile, currentMapData, measureStart, measureEnd, brushSize, setTileAt, setTilesAt, smartErase, floodFill, eyedrop])
+  }, [activeTool, selectedTile, currentMapData, measureStart, measureEnd, brushSize, setTileAt, setTilesAt, smartErase, floodFill, eyedrop, placeMountain])
 
   // 用 ref 保持回调最新引用，避免 EventBus 订阅中的闭包过期问题
   const handleTileClickRef = useRef(handleTileClick)
@@ -334,15 +516,11 @@ export default function TilemapCanvas({ selectedTile, activeTool, mapData, onMap
   // 像素坐标转瓦片坐标（使用库内部相同的转换公式）
   const pixelToTile = useCallback((pixelPos) => {
     const cam = cameraRef.current
-    const canvas = canvasRef.current
-    if (!cam || !canvas) return null
-    const rect = canvas.getBoundingClientRect()
-    const tileSize = displayTileSize
-    // 相机绝对像素偏移
-    const absX = rect.width / 2 - cam.x * tileSize - tileSize / 2
-    const absY = rect.height / 2 - cam.y * tileSize - tileSize / 2
-    const col = Math.floor((pixelPos.x - absX) / tileSize)
-    const row = Math.floor((pixelPos.y - absY) / tileSize)
+    if (!cam) return null
+    const off = getCanvasOffset(canvasRef, cam, displayTileSize)
+    if (!off) return null
+    const col = Math.floor((pixelPos.x - off.absX) / displayTileSize)
+    const row = Math.floor((pixelPos.y - off.absY) / displayTileSize)
     return { x: col, y: row }
   }, [displayTileSize])
 
@@ -356,10 +534,13 @@ export default function TilemapCanvas({ selectedTile, activeTool, mapData, onMap
       }
     }
     const handleUp = () => setIsDragging(false)
+    const handleLeave = () => setHoverTile(null)
     el.addEventListener('mousedown', handleDown)
+    el.addEventListener('mouseleave', handleLeave)
     window.addEventListener('mouseup', handleUp)
     return () => {
       el.removeEventListener('mousedown', handleDown)
+      el.removeEventListener('mouseleave', handleLeave)
       window.removeEventListener('mouseup', handleUp)
     }
   }, [])
@@ -444,9 +625,29 @@ export default function TilemapCanvas({ selectedTile, activeTool, mapData, onMap
             y: Math.floor(currentMapData.rows / 2)
           }}
         >
-          <CameraTracker cameraRef={cameraRef} />
+          <CameraTracker cameraRef={cameraRef} onCameraChange={setCameraPos} />
         </ThirdPersonCamera>
       </Tilemap>
+
+      <MountainOverlay
+        mountains={mountains}
+        tileSize={displayTileSize}
+        cameraPos={cameraPos}
+        canvasRef={canvasRef}
+      />
+
+      {activeTool === 'paint' && !spaceHeld && (
+        <HoverPreview
+          selectedTile={selectedTile}
+          hoverTile={hoverTile}
+          brushSize={brushSize}
+          tileSize={displayTileSize}
+          cameraPos={cameraPos}
+          canvasRef={canvasRef}
+          mapCols={currentMapData.cols}
+          mapRows={currentMapData.rows}
+        />
+      )}
 
       {/* 底部状态栏 */}
       <div className="tilemap-statusbar">
