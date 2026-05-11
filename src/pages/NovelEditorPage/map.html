@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>COBALT ARCHIVE | 绘图矩阵</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#b5c4ff",
+                        "outline-variant": "#434656",
+                        "surface-container-highest": "#32343e",
+                        "surface-container": "#1d1f29",
+                        "surface-tint": "#b5c4ff",
+                        "surface-container-high": "#272a33",
+                        "inverse-primary": "#0050e4",
+                        "surface-bright": "#373943",
+                        "on-secondary-container": "#a2b5ff",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#e9ebff",
+                        "on-primary": "#00287d",
+                        "surface-variant": "#32343e",
+                        "surface-container-lowest": "#0b0e17",
+                        "primary-fixed": "#dce1ff",
+                        "primary-container": "#005aff",
+                        "on-secondary-fixed": "#00164e",
+                        "outline": "#8d90a2",
+                        "surface-dim": "#11131c",
+                        "inverse-surface": "#e1e1ef",
+                        "tertiary": "#ffb59f",
+                        "surface": "#11131c",
+                        "on-primary-fixed": "#00164e",
+                        "on-tertiary-fixed-variant": "#862300",
+                        "tertiary-container": "#c43801",
+                        "secondary-container": "#2c448e",
+                        "secondary": "#b5c4ff",
+                        "error": "#ffb4ab",
+                        "on-tertiary-container": "#ffe7e1",
+                        "background": "#11131c",
+                        "on-tertiary-fixed": "#3a0a00",
+                        "primary": "#b5c4ff",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-low": "#191b24",
+                        "tertiary-fixed-dim": "#ffb59f",
+                        "on-surface-variant": "#c3c5d9",
+                        "on-error": "#690005",
+                        "on-tertiary": "#5f1600",
+                        "on-secondary": "#0d2a74",
+                        "on-surface": "#e1e1ef",
+                        "inverse-on-surface": "#2e303a",
+                        "on-background": "#e1e1ef",
+                        "secondary-fixed": "#dce1ff",
+                        "tertiary-fixed": "#ffdbd1",
+                        "on-secondary-fixed-variant": "#2a428b",
+                        "on-primary-fixed-variant": "#003baf",
+                        "secondary-fixed-dim": "#b5c4ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "display": ["Space Grotesk"],
+                        "body": ["Newsreader"],
+                        "label": ["Space Grotesk"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .canvas-grid {
+            background-image: 
+                linear-gradient(to right, rgba(141, 144, 162, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(141, 144, 162, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .cursor-precision {
+            cursor: crosshair;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0e17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #434656;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface selection:bg-primary-container selection:text-on-primary-container overflow-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest flex justify-between items-center px-6 py-3">
+<div class="flex items-center gap-6">
+<span class="font-headline font-bold text-primary tracking-tighter text-lg">COBALT ARCHIVE</span>
+<div class="hidden md:flex items-center gap-8">
+<span class="font-headline text-primary font-bold uppercase tracking-widest text-label-sm cursor-pointer">Manuscript</span>
+<span class="font-headline text-on-surface-variant hover:text-primary transition-colors duration-200 uppercase tracking-widest text-label-sm cursor-pointer">Chronicles</span>
+<span class="font-headline text-on-surface-variant hover:text-primary transition-colors duration-200 uppercase tracking-widest text-label-sm cursor-pointer">Persona</span>
+<span class="font-headline text-on-surface-variant hover:text-primary transition-colors duration-200 uppercase tracking-widest text-label-sm cursor-pointer">Lexicon</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors duration-200">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors duration-200">settings</button>
+<div class="w-8 h-8 rounded-lg overflow-hidden border border-outline-variant/30">
+<img alt="Auteur Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0gWt-zi-7TO2bgFhb-dXWF-qdsxIx4c0U0Q-sRhaJD4L_N_B4bWMfvobWuqrnpbeZZUBENibdq_hshfB0Q-ozgufK45LwrveNvAvCm3fZ3D_JMQT8TRUbBc2vVTlywcVhL-J5SP9akXEZK0YiJNDmgVTxgFDPZVeK1_JgTyL05xmBZg5RvH6s4pQpYwGJaR3e9QGhcCYkDZEUi8yfwcK6ecG45QBUyafmX9foqbP0W_Or2Qu56CjWoCORIY-LpcqUh7VKEBWI-pM"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Left) -->
+<nav class="fixed left-0 top-0 h-full w-20 flex flex-col items-center py-20 z-40 bg-surface-container-low">
+<div class="flex flex-col items-center gap-8 flex-1">
+<div class="group relative flex flex-col items-center cursor-pointer">
+<div class="bg-secondary-container text-on-secondary-container rounded-lg p-3 transition-all duration-150 active:scale-95">
+<span class="material-symbols-outlined">description</span>
+</div>
+<span class="absolute left-20 bg-inverse-surface text-inverse-on-surface px-2 py-1 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity font-headline">MANUSCRIPT</span>
+</div>
+<div class="group relative flex flex-col items-center cursor-pointer">
+<div class="text-on-surface-variant hover:bg-secondary-container/20 p-3 rounded-lg transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined">auto_stories</span>
+</div>
+</div>
+<div class="group relative flex flex-col items-center cursor-pointer">
+<div class="text-on-surface-variant hover:bg-secondary-container/20 p-3 rounded-lg transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined">account_circle</span>
+</div>
+</div>
+<div class="group relative flex flex-col items-center cursor-pointer">
+<div class="text-on-surface-variant hover:bg-secondary-container/20 p-3 rounded-lg transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined">menu_book</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-center gap-6 pb-8 border-t border-outline-variant/10 pt-6">
+<div class="text-on-surface-variant hover:bg-secondary-container/20 p-3 rounded-lg transition-all duration-300 cursor-pointer">
+<span class="material-symbols-outlined">terminal</span>
+</div>
+<div class="text-on-surface-variant hover:bg-secondary-container/20 p-3 rounded-lg transition-all duration-300 cursor-pointer">
+<span class="material-symbols-outlined">logout</span>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="pl-20 pt-14 h-screen w-full relative bg-surface-container-lowest">
+<!-- Full-screen Map Editor View -->
+<div class="absolute inset-0 pl-20 pt-14 cursor-precision overflow-hidden">
+<div class="w-full h-full canvas-grid relative flex items-center justify-center">
+<!-- Map Layer Mockup -->
+<div class="w-[2000px] h-[1500px] relative">
+<img class="w-full h-full object-cover opacity-60 mix-blend-luminosity grayscale contrast-125" data-alt="A sprawling, high-resolution digital map of a futuristic urban grid from a top-down perspective. The map details complex architectural geometries, neon arterial roads in deep cobalt blue, and industrial zoning defined by dark steel textures. The overall aesthetic is cinematic and obsidian-themed, featuring high-contrast lighting and a sophisticated atmospheric haze that suggests a vast, living metropolis at night." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKI9ioy9HGEg8w1yt7vRwQ7LbGUPJrPzu3dI3s7Y7USkTJQp3yT-48kUTPy_qPIte9MfiFrZ33aTBq3tLI0nqT7wA3wILQQCWr1qRDhmLDjL6N6lnvcnurayToScRm4qS6M4MFq76pXOh6E0_mvp-I-VpzSi0Q1KW3OgxnCG8OxntpepDw-m1ML0O_BO2a2YcNaKnSpcNHT6TajYSIw7bIVYBgjycdQXdXYwpj4Lj4SfZzd7Y3jfvM41wolCRPrX6Jn-JS2msvB4Q"/>
+<!-- SVG Overlay for Paths/Drawings -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none opacity-80" xmlns="http://www.w3.org/2000/svg">
+<path class="drop-shadow-[0_0_8px_#005aff]" d="M 400 400 L 800 450 L 1200 420" fill="none" stroke="#005aff" stroke-width="2"></path>
+<circle cx="400" cy="400" fill="#005aff" r="4"></circle>
+<circle cx="800" cy="450" fill="#005aff" r="4"></circle>
+<circle cx="1200" cy="420" fill="#005aff" r="4"></circle>
+</svg>
+</div>
+</div>
+</div>
+<!-- Floating Toolbox -->
+<div class="fixed top-20 right-8 z-30 w-72 flex flex-col bg-surface-container-high/60 backdrop-blur-2xl rounded-xl shadow-2xl border border-primary-container/30 overflow-hidden">
+<!-- Toolbox Header -->
+<div class="flex items-center justify-between px-3 py-2 bg-surface-container-highest/50 border-b border-primary-container/20">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary-container cursor-move">drag_indicator</span>
+<span class="font-headline text-[10px] tracking-widest text-on-surface uppercase">编辑工具箱</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="material-symbols-outlined text-xs text-on-surface-variant hover:text-on-surface">remove</button>
+<button class="material-symbols-outlined text-xs text-on-surface-variant hover:text-on-surface">check_box_outline_blank</button>
+<button class="material-symbols-outlined text-xs text-on-surface-variant hover:text-error">close</button>
+</div>
+</div>
+<!-- Tabs Navigation -->
+<div class="flex border-b border-outline-variant/20">
+<button class="flex-1 py-2 text-[11px] font-headline tracking-wider text-primary border-b-2 border-primary-container bg-primary-container/10 transition-colors">画笔工具</button>
+<button class="flex-1 py-2 text-[11px] font-headline tracking-wider text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-colors">瓦片资产</button>
+</div>
+<!-- Tab Content Container -->
+<div class="p-4 flex flex-col gap-6">
+<!-- Tab 1 Content (Brush Tools) -->
+<div class="grid grid-cols-4 gap-2">
+<div class="aspect-square bg-primary-container text-on-primary-container rounded-lg flex items-center justify-center cursor-pointer shadow-[0_0_15px_rgba(0,90,255,0.3)]" title="画笔">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">edit</span>
+</div>
+<div class="aspect-square bg-surface-variant/40 text-on-surface-variant hover:text-primary hover:bg-surface-variant rounded-lg flex items-center justify-center cursor-pointer transition-all" title="填充">
+<span class="material-symbols-outlined text-xl">format_color_fill</span>
+</div>
+<div class="aspect-square bg-surface-variant/40 text-on-surface-variant hover:text-primary hover:bg-surface-variant rounded-lg flex items-center justify-center cursor-pointer transition-all" title="橡皮擦">
+<span class="material-symbols-outlined text-xl">ink_eraser</span>
+</div>
+<div class="aspect-square bg-surface-variant/40 text-on-surface-variant hover:text-primary hover:bg-surface-variant rounded-lg flex items-center justify-center cursor-pointer transition-all" title="路径">
+<span class="material-symbols-outlined text-xl">gesture</span>
+</div>
+</div>
+<!-- Separator -->
+<div class="h-px bg-outline-variant/20"></div>
+<!-- Controls (Size & Opacity) -->
+<div class="space-y-5">
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="font-headline text-[10px] tracking-widest text-on-surface-variant uppercase">大小 (Size)</label>
+<span class="text-[10px] text-primary">12px</span>
+</div>
+<div class="h-1 bg-surface-variant/50 rounded-full relative">
+<div class="absolute inset-y-0 left-0 w-1/2 bg-primary-container shadow-[0_0_8px_rgba(0,90,255,0.4)]"></div>
+<div class="absolute -top-1.5 left-1/2 w-4 h-4 bg-on-surface border-2 border-primary-container rounded-full shadow-lg cursor-pointer"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="font-headline text-[10px] tracking-widest text-on-surface-variant uppercase">不透明度 (Opacity)</label>
+<span class="text-[10px] text-primary">80%</span>
+</div>
+<div class="h-1 bg-surface-variant/50 rounded-full relative">
+<div class="absolute inset-y-0 left-0 w-[80%] bg-primary-container shadow-[0_0_8px_rgba(0,90,255,0.4)]"></div>
+<div class="absolute -top-1.5 left-[80%] w-4 h-4 bg-on-surface border-2 border-primary-container rounded-full shadow-lg cursor-pointer"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Actions -->
+<div class="px-4 py-3 bg-surface-container-highest/30 border-t border-outline-variant/20 flex justify-end gap-2">
+<button class="px-3 py-1.5 bg-surface-variant text-[10px] font-headline tracking-widest text-on-surface-variant rounded hover:text-on-surface transition-colors">重置</button>
+<button class="px-3 py-1.5 bg-primary-container text-[10px] font-headline tracking-widest text-on-primary-container rounded shadow-[0_0_10px_rgba(0,90,255,0.2)] hover:scale-105 transition-transform">应用</button>
+</div>
+</div>
+<!-- Floating Metadata HUD -->
+<div class="fixed bottom-8 left-28 z-30 pointer-events-none">
+<div class="bg-surface-container-high/80 backdrop-blur-xl p-4 rounded-lg border border-outline-variant/20">
+<div class="flex items-center gap-4">
+<div class="flex flex-col">
+<span class="font-headline text-[10px] tracking-widest text-primary font-bold">COORDINATES</span>
+<span class="font-headline text-label-sm text-on-surface">X: 124.089 / Y: 562.112</span>
+</div>
+<div class="w-px h-8 bg-outline-variant/30"></div>
+<div class="flex flex-col">
+<span class="font-headline text-[10px] tracking-widest text-secondary font-bold">SECTOR</span>
+<span class="font-headline text-label-sm text-on-surface">OBSIDIAN_DELTA_09</span>
+</div>
+<div class="w-px h-8 bg-outline-variant/30"></div>
+<div class="flex flex-col">
+<span class="font-headline text-[10px] tracking-widest text-tertiary font-bold">STATUS</span>
+<span class="font-headline text-label-sm text-on-surface">SYNCED_01</span>
+</div>
+</div>
+</div>
+</div>
+<!-- FAB - Toggle Toolbox -->
+<button class="fixed bottom-8 right-8 z-40 w-14 h-14 bg-primary-container text-on-primary-container rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(0,90,255,0.4)] transition-all active:scale-90 hover:scale-105 group">
+<span class="material-symbols-outlined text-2xl group-hover:rotate-180 transition-transform duration-500">construction</span>
+</button>
+</main>
+<!-- Context Indicators -->
+<div class="fixed bottom-0 right-0 p-4 font-headline text-[9px] tracking-widest text-outline-variant pointer-events-none">
+        RENDER_ENGINE: COBALT_CORE_V4.2 // BUFFER: STABLE
+    </div>
+</body></html>

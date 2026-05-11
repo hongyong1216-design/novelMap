@@ -1,0 +1,20 @@
+import { Navigate } from 'react-router-dom'
+import NovelEditorPage from './index'
+import contentRoute from './subpages/ContentEditor/route'
+import mapRoute from './subpages/MapEditor/route'
+import factionRoute from './subpages/FactionEditor/route'
+import characterRoute from './subpages/CharacterProfile/route'
+import storylineRoute from './subpages/StorylineEditor/route'
+
+export default {
+  path: '/editor/:novelId',
+  element: <NovelEditorPage />,
+  children: [
+    { index: true, element: <Navigate to="content" replace /> },
+    contentRoute,
+    mapRoute,
+    factionRoute,
+    characterRoute,
+    storylineRoute,
+  ],
+}

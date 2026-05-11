@@ -1,0 +1,115 @@
+.chapter-list-modal .ant-modal-content {
+  background-color: #11131c;
+  border: 1px solid rgba(67, 70, 86, 0.4);
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+}
+
+.chapter-list-modal .ant-modal-header {
+  background-color: transparent;
+  border-bottom: 1px solid rgba(67, 70, 86, 0.4);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.chapter-list-modal .ant-modal-title {
+  color: #e1e1ef;
+}
+
+.chapter-list-modal__title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #e1e1ef;
+}
+
+.chapter-list-modal__title-tag {
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #b5c4ff;
+  background-color: rgba(0, 90, 255, 0.2);
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.125rem;
+}
+
+.chapter-list-modal__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.chapter-list-modal__row {
+  display: block;
+}
+
+.chapter-list-modal__item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  text-align: left;
+  color: #e1e1ef;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.chapter-list-modal__item:hover {
+  background-color: rgba(0, 90, 255, 0.08);
+  border-color: rgba(67, 70, 86, 0.6);
+}
+
+.chapter-list-modal__item--current {
+  background-color: rgba(0, 90, 255, 0.16);
+  border-color: rgba(0, 90, 255, 0.5);
+}
+
+.chapter-list-modal__index {
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  color: #8d90a2;
+  font-weight: 700;
+}
+
+.chapter-list-modal__item--current .chapter-list-modal__index {
+  color: #b5c4ff;
+}
+
+.chapter-list-modal__chapter-title {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.chapter-list-modal__meta {
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8d90a2;
+}
+
+.chapter-list-modal__current-pill {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  background-color: #005aff;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.125rem;
+  margin-left: 0.5rem;
+}

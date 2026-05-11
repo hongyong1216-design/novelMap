@@ -1,0 +1,7 @@
+.novel-editor-page {
+  height: 100vh;
+}
+
+.novel-editor-content {
+  overflow: auto;
+}
