@@ -1,0 +1,74 @@
+.canvas-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1.5rem;
+  background-color: #191b24;
+  border-top: 1px solid rgba(67, 70, 86, 0.1);
+  flex-shrink: 0;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.canvas-footer__group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.canvas-footer__group--right {
+  gap: 1rem;
+}
+
+.canvas-footer__label {
+  font-size: 0.5625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8d90a2;
+}
+
+.canvas-footer__label--strong {
+  color: #e1e1ef;
+}
+
+.canvas-footer__progress {
+  width: 8rem;
+  height: 4px;
+  background-color: #32343e;
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.canvas-footer__progress-bar {
+  height: 100%;
+  background-color: #b5c4ff;
+  transition: width 0.3s ease;
+}
+
+.canvas-footer__status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.canvas-footer__status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: #8d90a2;
+}
+
+.canvas-footer__status-dot--ready {
+  background-color: #b5c4ff;
+  animation: canvas-footer-pulse 2s ease-in-out infinite;
+}
+
+@keyframes canvas-footer-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+.canvas-footer__divider {
+  width: 1px;
+  height: 1rem;
+  background-color: rgba(67, 70, 86, 0.3);
+}

@@ -1,0 +1,109 @@
+.connections {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.connections__title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #c3c5d9;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(67, 70, 86, 0.2);
+  margin: 0;
+}
+
+.connections__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 720px) {
+  .connections__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.connections__card {
+  padding: 1rem;
+  background-color: #272a33;
+  border: 1px solid rgba(67, 70, 86, 0.2);
+  border-radius: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.connections__tag {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.connections__card--tertiary .connections__tag {
+  color: #c43801;
+}
+
+.connections__card--primary .connections__tag {
+  color: #b5c4ff;
+}
+
+.connections__heading {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #e1e1ef;
+  margin: 0;
+}
+
+.connections__desc {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 0.75rem;
+  color: #c3c5d9;
+  margin: 0;
+  line-height: 1.55;
+}
+
+.connections__add {
+  background-color: #272a33;
+  border: 1px solid rgba(67, 70, 86, 0.2);
+  border-radius: 0.25rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: border-color 0.2s;
+  color: #8d90a2;
+  min-height: 100%;
+}
+
+.connections__add:hover {
+  border-color: #005aff;
+  color: #b5c4ff;
+}
+
+.connections__add::after {
+  content: '';
+  position: absolute;
+}
+
+.connections__add-icon {
+  font-size: 0.875rem;
+  color: inherit;
+}
+
+.connections__add-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: inherit;
+}

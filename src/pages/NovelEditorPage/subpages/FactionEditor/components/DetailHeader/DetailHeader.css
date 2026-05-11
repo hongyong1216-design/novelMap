@@ -1,0 +1,97 @@
+.detail-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.detail-header__icon {
+  width: 5rem;
+  height: 5rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #32343e;
+  border: 1px solid rgba(0, 90, 255, 0.2);
+  border-radius: 0.5rem;
+  color: #b5c4ff;
+  font-size: 2rem;
+}
+
+.detail-header__icon-inner {
+  display: inline-flex;
+}
+
+.detail-header__meta {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detail-header__name.ant-input {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #e1e1ef;
+  padding: 0;
+  background: transparent;
+}
+
+.detail-header__name.ant-input:focus,
+.detail-header__name.ant-input-focused {
+  box-shadow: none;
+  outline: none;
+}
+
+.detail-header__sub {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.25rem;
+}
+
+.detail-header__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.detail-header__status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.detail-header__status-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #c3c5d9;
+}
+
+.detail-header__divider {
+  width: 1px;
+  height: 0.75rem;
+  background-color: #434656;
+}
+
+.detail-header__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.detail-header__btn.ant-btn {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.625rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.detail-header__btn--primary.ant-btn {
+  box-shadow: 0 0 15px rgba(0, 90, 255, 0.3);
+}

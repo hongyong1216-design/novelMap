@@ -1,0 +1,22 @@
+.map-canvas {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #0d2a3a;
+}
+
+.map-canvas--cursor-default {
+  cursor: default;
+}
+
+.map-canvas--cursor-brush {
+  cursor: none;
+}
+
+.map-canvas--cursor-grab {
+  cursor: grab;
+}
+
+.map-canvas--cursor-grab:active {
+  cursor: grabbing;
+}

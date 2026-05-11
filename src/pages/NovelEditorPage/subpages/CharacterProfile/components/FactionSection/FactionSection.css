@@ -1,0 +1,51 @@
+.faction-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.faction-section:last-child {
+  margin-bottom: 0;
+}
+
+.faction-section__head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.faction-section__bar {
+  width: 0.25rem;
+  height: 1.5rem;
+  background-color: var(--section-tone-bar, #005aff);
+  flex-shrink: 0;
+}
+
+.faction-section__title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #e1e1ef;
+  margin: 0;
+}
+
+.faction-section__badge {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.125rem 0.5rem;
+  color: var(--section-tone-text, #b5c4ff);
+  background-color: rgba(0, 0, 0, 0.001);
+  border: 1px solid;
+  border-color: color-mix(in srgb, var(--section-tone-bar, #005aff) 30%, transparent);
+}
+
+.faction-section__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}

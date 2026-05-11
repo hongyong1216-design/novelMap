@@ -1,0 +1,173 @@
+.character-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: #191b24;
+  border: 2px solid var(--card-tone-bar, #005aff);
+  border-radius: 0.25rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.3s, transform 0.2s;
+  font-family: 'Space Grotesk', sans-serif;
+  height: 100%;
+}
+
+.character-card:hover {
+  border-color: var(--card-tone-text, #b5c4ff);
+}
+
+.character-card:active {
+  transform: scale(0.995);
+}
+
+.character-card__media {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.character-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1);
+  transition: filter 0.7s ease, transform 0.7s ease;
+  display: block;
+}
+
+.character-card:hover .character-card__image {
+  filter: grayscale(0);
+  transform: scale(1.05);
+}
+
+.character-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, #191b24 0%, transparent 50%, transparent 100%);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.character-card__deceased-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(11, 14, 23, 0.4);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.character-card--deceased {
+  opacity: 0.7;
+  border-color: #ffb4ab;
+}
+
+.character-card--deceased .character-card__image {
+  filter: grayscale(1);
+}
+
+.character-card--deceased:hover .character-card__image {
+  filter: grayscale(1);
+  transform: none;
+}
+
+.character-card__body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+.character-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.character-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.character-card__serial {
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--card-tone-text, #b5c4ff);
+}
+
+.character-card__name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: #e1e1ef;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.character-card__name--muted {
+  color: #8d90a2;
+  font-size: 1.125rem;
+}
+
+.character-card__status {
+  font-size: 0.5625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #ffb4ab;
+  font-weight: 600;
+  flex-shrink: 0;
+  padding-top: 0.25rem;
+}
+
+.character-card__role {
+  font-size: 0.5625rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.125rem 0.5rem;
+  background-color: var(--card-tone-bg, rgba(0, 90, 255, 0.1));
+  color: var(--card-tone-text, #b5c4ff);
+  border: 1px solid var(--card-tone-border, rgba(0, 90, 255, 0.2));
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.character-card--primary .character-card__role {
+  background-color: rgba(0, 90, 255, 0.1);
+  border-color: rgba(0, 90, 255, 0.2);
+}
+
+.character-card--tertiary .character-card__role {
+  background-color: rgba(196, 56, 1, 0.1);
+  border-color: rgba(196, 56, 1, 0.2);
+}
+
+.character-card--secondary .character-card__role {
+  background-color: rgba(93, 115, 192, 0.1);
+  border-color: rgba(93, 115, 192, 0.2);
+}
+
+.character-card--outline .character-card__role {
+  background-color: rgba(141, 144, 162, 0.1);
+  border-color: rgba(141, 144, 162, 0.2);
+}
+
+.character-card__desc {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: #c3c5d9;
+  margin: 0;
+}
+
+.character-card__quote {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: #8d90a2;
+  font-style: italic;
+  margin: 0;
+}

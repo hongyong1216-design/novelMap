@@ -1,0 +1,115 @@
+.decision-node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.decision-node__dot {
+  position: absolute;
+  top: 50%;
+  width: 0.75rem;
+  height: 0.75rem;
+  background-color: #00f2ff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #00f2ff;
+  z-index: 20;
+  transform: translateY(-50%);
+  cursor: crosshair;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.decision-node__dot:hover {
+  transform: translateY(-50%) scale(1.25);
+  box-shadow: 0 0 15px #00f2ff;
+}
+
+.decision-node__dot--left {
+  left: -0.375rem;
+}
+
+.decision-node__dot--right {
+  right: -0.375rem;
+}
+
+.decision-node__card {
+  width: 16rem;
+  padding: 1.25rem;
+  background-color: #32343e;
+  border-top: 2px solid #005aff;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.decision-node__card--active {
+  transform: scale(1.1);
+  outline: 1px solid rgba(0, 90, 255, 0.4);
+  outline-offset: -1px;
+}
+
+.decision-node__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.decision-node__tag {
+  font-size: 0.625rem;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #b5c4ff;
+  font-weight: 600;
+}
+
+.decision-node__warn {
+  font-size: 1.125rem;
+  color: #ffb59f;
+}
+
+.decision-node__title {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-style: italic;
+  color: #e1e1ef;
+  margin: 0;
+}
+
+.decision-node__options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.decision-node__option {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.625rem;
+  background-color: #1d1f29;
+  border: 1px solid #434656;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  color: #e1e1ef;
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.decision-node__option:hover {
+  background-color: rgba(44, 68, 142, 0.1);
+}
+
+.decision-node__option--selected {
+  border-color: rgba(0, 90, 255, 0.4);
+  background-color: rgba(0, 90, 255, 0.05);
+}
+
+.decision-node__option--selected:hover {
+  background-color: rgba(0, 90, 255, 0.12);
+}

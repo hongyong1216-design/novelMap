@@ -1,0 +1,33 @@
+.add-node {
+  width: 12rem;
+  height: 12rem;
+  border: 2px dashed #434656;
+  background: transparent;
+  border-radius: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: #8d90a2;
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+  font-family: 'Space Grotesk', sans-serif;
+  flex-shrink: 0;
+}
+
+.add-node:hover {
+  border-color: rgba(0, 90, 255, 0.5);
+  color: #b5c4ff;
+  background-color: rgba(0, 90, 255, 0.05);
+}
+
+.add-node__icon {
+  font-size: 1.75rem;
+}
+
+.add-node__label {
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}

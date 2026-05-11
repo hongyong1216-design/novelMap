@@ -1,0 +1,69 @@
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+  .profile-header {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+
+.profile-header__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.profile-header__title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 3rem;
+  font-weight: 300;
+  color: #e1e1ef;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.profile-header__subtitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #b5c4ff;
+  margin: 0;
+}
+
+.profile-header__actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.profile-header__create.ant-btn {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  height: 2.5rem;
+  padding: 0 1.25rem;
+  box-shadow: 0 0 15px rgba(0, 90, 255, 0.3);
+}
+
+.profile-header__filter.ant-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: #272a33;
+  border-color: rgba(67, 70, 86, 0.4);
+  color: #c3c5d9;
+}
+
+.profile-header__filter.ant-btn:hover {
+  background-color: rgba(44, 68, 142, 0.2);
+  color: #b5c4ff;
+}

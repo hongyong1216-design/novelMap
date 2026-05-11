@@ -1,0 +1,56 @@
+export const FACTION_STATUS = {
+  active:  { key: 'active',  label: '活跃', dotColor: '#005aff' },
+  neutral: { key: 'neutral', label: '中立', dotColor: '#b5c4ff' },
+  hostile: { key: 'hostile', label: '敌对', dotColor: '#ffb4ab' },
+  hidden:  { key: 'hidden',  label: '隐藏', dotColor: '#8d90a2' },
+}
+
+export const factions = [
+  {
+    id: '0X-8821',
+    name: '钴蓝深海联合',
+    status: 'neutral',
+    active: true,
+    iconKey: 'water',
+    summary: '位于旧港区底层的技术专家联盟，掌握着核心档案的修复技术。',
+    overview:
+      '由流浪的深海技术专家组建的去中心化组织。他们认为深海中的数据压力能够过滤掉网络中的虚假噪音。钴蓝深海联合的成员通常身着深蓝色防水涂层风衣，携带自制的信号增强设备。',
+    leadership: '阿特拉斯·魏',
+    sector: '旧港区-04层',
+    capabilities: ['深海挖掘', '液态冷却', '加密通讯'],
+    members: ['DS', 'MK'],
+    updatedAt: '2小时前',
+    connections: [
+      { type: 'conflict', title: '港区资源争夺', desc: '关于深海发掘权的永久争端，已持续三个季度。' },
+      { type: 'ally',     title: '中性网络观察者', desc: '共享数据流与冷却设备，维持脆弱的合作。' },
+    ],
+  },
+  {
+    id: '0X-1209',
+    name: '钢铁锈蚀议会',
+    status: 'hostile',
+    iconKey: 'iron',
+    summary: '工业区的实际统治者，对所有非官方技术交流持极度排斥态度。',
+    overview: '',
+    leadership: '',
+    sector: '工业区-02层',
+    capabilities: [],
+    members: ['RX'],
+    updatedAt: '昨天',
+    connections: [],
+  },
+  {
+    id: '0X-4450',
+    name: '虚空协议',
+    status: 'hidden',
+    iconKey: 'void',
+    summary: '仅存在于流言中的幽灵组织，据说他们可以操纵网络层的现实感知。',
+    overview: '',
+    leadership: '',
+    sector: '未知',
+    capabilities: [],
+    members: [],
+    updatedAt: '绝密状态',
+    connections: [],
+  },
+]
