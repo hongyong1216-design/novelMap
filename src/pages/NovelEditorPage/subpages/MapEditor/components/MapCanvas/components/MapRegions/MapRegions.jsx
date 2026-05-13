@@ -1,9 +1,6 @@
 import { useState } from 'react'
 import { Group, Line, Text } from 'react-konva'
-import {
-  mapRegions, mapDesert, mapGlacier,
-  mapNorthIce1, mapNorthIce2, mapSouthIce,
-} from '../../data/world'
+import { mapRegions } from '../../data/world'
 import { parsePath } from '../../utils/path'
 
 const REGION_FILL = {
@@ -61,43 +58,6 @@ export default function MapRegions({
           </Group>
         )
       })}
-
-      {/* 沙漠 */}
-      <Line
-        points={parsePath(mapDesert).flatMap((p) => p)}
-        closed
-        fill="#c4a44a"
-        stroke="#aa8a3a"
-        strokeWidth={1}
-        opacity={0.8}
-        listening={false}
-      />
-      <Text
-        x={620}
-        y={545}
-        text="大荒漠"
-        fontSize={14}
-        fill="#8a6a2a"
-        fontFamily="sans-serif"
-        listening={false}
-      />
-
-      {/* 冰川 */}
-      <Line
-        points={parsePath(mapGlacier).flatMap((p) => p)}
-        closed
-        fill="#d8dde0"
-        stroke="#8a9aa0"
-        strokeWidth={1}
-        opacity={0.8}
-        listening={false}
-      />
-
-      {/* 南北冰原 */}
-      <Line points={parsePath(mapNorthIce1).flatMap((p) => p)} closed fill="#b8c8d0" stroke="#8a9aa0" strokeWidth={1} opacity={0.6} listening={false} />
-      <Line points={parsePath(mapNorthIce2).flatMap((p) => p)} closed fill="#b8c8d0" stroke="#8a9aa0" strokeWidth={1} opacity={0.6} listening={false} />
-      <Line points={parsePath(mapSouthIce).flatMap((p) => p)} closed fill="#b8c8d0" stroke="#8a9aa0" strokeWidth={1} opacity={0.5} listening={false} />
-      <Text x={900} y={1135} text="冻土荒原" fontSize={24} fontStyle="bold" fill="#6a7a8a" fontFamily="sans-serif" listening={false} />
     </Group>
   )
 }

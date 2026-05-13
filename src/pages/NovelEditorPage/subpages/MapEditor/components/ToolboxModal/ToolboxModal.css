@@ -7,45 +7,39 @@
   font-weight: 600;
 }
 
-.toolbox-modal__tabs {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.toolbox-modal .ant-tabs-nav {
-  margin: 0;
-  padding: 0 0.5rem;
-}
-
-.toolbox-modal .ant-tabs-tab {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.6875rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.toolbox-modal .ant-tabs-content-holder {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-}
-
 .toolbox-modal__panel {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
   padding: 1.25rem;
+  height: 100%;
+  overflow-y: auto;
 }
 
-.toolbox-modal__tool-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+.toolbox-modal__section {
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
 }
 
-.toolbox-modal__tool,
-.toolbox-modal__tile {
+.toolbox-modal__section-label,
+.toolbox-modal__control-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #c3c5d9;
+}
+
+.toolbox-modal__brush-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.toolbox-modal__brush,
+.toolbox-modal__mode {
+  position: relative;
   aspect-ratio: 1;
   border: none;
   border-radius: 0.25rem;
@@ -53,8 +47,11 @@
   color: #c3c5d9;
   cursor: pointer;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.25rem;
   transition:
     background-color 0.2s,
     color 0.2s,
@@ -62,39 +59,66 @@
     transform 0.1s;
 }
 
-.toolbox-modal__tool:hover,
-.toolbox-modal__tile:hover {
+.toolbox-modal__brush:hover,
+.toolbox-modal__mode:hover {
   background-color: rgba(50, 52, 62, 0.8);
   color: #b5c4ff;
 }
 
-.toolbox-modal__tool:active,
-.toolbox-modal__tile:active {
+.toolbox-modal__brush:active,
+.toolbox-modal__mode:active {
   transform: scale(0.96);
 }
 
-.toolbox-modal__tool--active,
-.toolbox-modal__tile--active {
+.toolbox-modal__brush--active,
+.toolbox-modal__mode--active {
   background-color: #005aff;
   color: #e9ebff;
   box-shadow: 0 0 15px rgba(0, 90, 255, 0.3);
 }
 
-.toolbox-modal__tool--active:hover,
-.toolbox-modal__tile--active:hover {
+.toolbox-modal__brush--active:hover,
+.toolbox-modal__mode--active:hover {
   background-color: #1f6dff;
   color: #ffffff;
 }
 
-.toolbox-modal__tool-icon {
-  font-size: 1.125rem;
+.toolbox-modal__brush-emoji {
+  font-size: 1.5rem;
   line-height: 1;
 }
 
-.toolbox-modal__tile-label {
+.toolbox-modal__brush-label,
+.toolbox-modal__mode-label {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.05em;
+}
+
+.toolbox-modal__brush-swatch {
+  position: absolute;
+  left: 0.4rem;
+  right: 0.4rem;
+  bottom: 0.4rem;
+  height: 2px;
+  border-radius: 1px;
+  opacity: 0.9;
+}
+
+.toolbox-modal__mode-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.toolbox-modal__mode {
+  aspect-ratio: auto;
+  padding: 0.625rem 0.5rem;
+}
+
+.toolbox-modal__mode-glyph {
+  font-size: 1.125rem;
+  line-height: 1;
 }
 
 .toolbox-modal__separator {
@@ -118,14 +142,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.toolbox-modal__control-label {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.625rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #c3c5d9;
 }
 
 .toolbox-modal__control-value {

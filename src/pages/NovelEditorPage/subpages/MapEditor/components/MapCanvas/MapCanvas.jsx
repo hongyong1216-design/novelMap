@@ -4,7 +4,6 @@ import MapBackground from './components/MapBackground/MapBackground'
 import MapRegions from './components/MapRegions/MapRegions'
 import MapMarkers from './components/MapMarkers/MapMarkers'
 import MapLabels from './components/MapLabels/MapLabels'
-import MapOverlays from './components/MapOverlays/MapOverlays'
 import BrushStrokes from './components/BrushStrokes/BrushStrokes'
 import BrushCursor from './components/BrushCursor/BrushCursor'
 import useStageView from './hooks/useStageView'
@@ -78,6 +77,7 @@ export default function MapCanvas({
         x={view.pos.x}
         y={view.pos.y}
         draggable={stageDraggable}
+        dragBoundFunc={view.dragBoundFunc}
         onDragEnd={view.handleDragEnd}
         onWheel={view.handleWheel}
         onMouseDown={painting.onMouseDown}
@@ -94,7 +94,6 @@ export default function MapCanvas({
           />
           <MapMarkers />
           <MapLabels />
-          <MapOverlays />
         </Layer>
 
         <BrushStrokes

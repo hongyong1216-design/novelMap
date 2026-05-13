@@ -6,8 +6,12 @@ import './MapEditor.css'
 
 export default function MapEditor() {
   const [toolboxOpen, setToolboxOpen] = useState(true)
-  const [selectedRegion, setSelectedRegion] = useState('veridian')
+  const [selectedRegion, setSelectedRegion] = useState(null)
   const [brushStrokes, setBrushStrokes] = useState([])
+
+  const [activeBrush, setActiveBrush] = useState(null)
+  const [brushSize, setBrushSize] = useState(40)
+  const [brushMode, setBrushMode] = useState('smooth')
 
   const addBrushStroke = (stroke) =>
     setBrushStrokes((prev) => [...prev, stroke])
@@ -17,6 +21,9 @@ export default function MapEditor() {
       <MapCanvas
         selectedRegion={selectedRegion}
         onSelectRegion={setSelectedRegion}
+        activeBrush={activeBrush}
+        brushSize={brushSize}
+        brushMode={brushMode}
         brushStrokes={brushStrokes}
         onAddBrushStroke={addBrushStroke}
       />
@@ -29,11 +36,13 @@ export default function MapEditor() {
       <ToolboxModal
         open={toolboxOpen}
         onClose={() => setToolboxOpen(false)}
+        activeBrush={activeBrush}
+        onBrushChange={setActiveBrush}
+        brushSize={brushSize}
+        onBrushSizeChange={setBrushSize}
+        brushMode={brushMode}
+        onBrushModeChange={setBrushMode}
       />
-
-      <div className="map-editor__context-indicator">
-        RENDER_ENGINE: COBALT_CORE_V4.2 // BUFFER: STABLE
-      </div>
     </div>
   )
 }
