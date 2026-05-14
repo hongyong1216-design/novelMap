@@ -1,0 +1,105 @@
+.leaflet-canvas-wrap {
+  width: 100%;
+  height: 100%;
+}
+
+.leaflet-canvas {
+  width: 100%;
+  height: 100%;
+  background: var(--bg-primary);
+  outline: none;
+}
+
+/* 隐藏所有默认控件残留 */
+.leaflet-control-attribution,
+.leaflet-control-container .leaflet-bottom {
+  display: none !important;
+}
+
+/* 网格单元 */
+.novelmap-cell {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.novelmap-cell__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.novelmap-cell--empty {
+  opacity: 0.55;
+}
+
+.novelmap-cell--empty:hover {
+  opacity: 0.8;
+}
+
+.novelmap-cell--filled:hover {
+  filter: brightness(1.15);
+}
+
+/* Marker (city / building / landmark) */
+.novelmap-marker {
+  background: transparent !important;
+  border: 0 !important;
+  pointer-events: auto;
+}
+
+.novelmap-marker__dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin: 0 auto;
+  border: 2px solid rgba(255, 255, 255, 0.65);
+  position: relative;
+  top: 0;
+}
+
+.novelmap-marker__label {
+  margin-top: 4px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-primary);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+/* 文字标签层 */
+.novelmap-label {
+  background: transparent !important;
+  border: 0 !important;
+  pointer-events: none;
+}
+
+.novelmap-label__text {
+  text-align: center;
+  color: var(--text-primary);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-shadow:
+    0 0 12px rgba(0, 0, 0, 0.95),
+    0 0 4px rgba(0, 0, 0, 1),
+    0 1px 2px rgba(0, 0, 0, 1);
+  text-transform: none;
+  white-space: nowrap;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* antd Modal 信息层视觉调和 */
+.leaflet-canvas-wrap .leaflet-interactive {
+  cursor: pointer;
+}

@@ -12,12 +12,11 @@
   "dependencies": {
     "@ant-design/icons": "^6.2.2",
     "antd": "^6.3.7",
-    "konva": "^9.3.22",
+    "leaflet": "^1.9.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-konva": "^18.2.14",
-    "react-router-dom": "^7.13.2",
-    "react-super-tilemap": "^1.1.1"
+    "react-leaflet": "^4.2.1",
+    "react-router-dom": "^7.13.2"
   },
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.1",
