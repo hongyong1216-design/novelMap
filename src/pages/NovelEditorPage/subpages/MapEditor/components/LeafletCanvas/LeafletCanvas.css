@@ -103,3 +103,70 @@
 .leaflet-canvas-wrap .leaflet-interactive {
   cursor: pointer;
 }
+
+/* 右上角网格规模控制 */
+.grid-size-control {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 500;
+  min-width: 180px;
+  padding: 10px 14px;
+  background: rgba(20, 20, 38, 0.88);
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.grid-size-control__label {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #a29bfe;
+  margin-bottom: 6px;
+  opacity: 0.85;
+}
+
+.grid-size-control__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.grid-size-control__value {
+  flex: 1;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.grid-size-control__meta {
+  margin-top: 8px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  font-variant-numeric: tabular-nums;
+}
+
+.grid-size-control__meta-sub {
+  opacity: 0.7;
+}
+
+.grid-size-control__confirm ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.grid-size-control__confirm code {
+  background: rgba(108, 92, 231, 0.15);
+  padding: 0 4px;
+  border-radius: 3px;
+  font-size: 12px;
+}
