@@ -1,0 +1,59 @@
+.edit-toolbar {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 500;
+  min-width: 200px;
+  padding: 10px 14px;
+  background: rgba(20, 20, 38, 0.88);
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.edit-toolbar__label {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #a29bfe;
+  margin-bottom: 8px;
+  opacity: 0.85;
+}
+
+.edit-toolbar__row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.edit-toolbar__row:last-child {
+  margin-bottom: 0;
+}
+
+.edit-toolbar__row--small {
+  opacity: 0.85;
+}
+
+.edit-toolbar__hint {
+  margin-top: 8px;
+  padding: 6px 8px;
+  background: rgba(108, 92, 231, 0.18);
+  border: 1px solid rgba(108, 92, 231, 0.4);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* 编辑模式下地图光标变十字 */
+.leaflet-canvas-wrap.editing .leaflet-container,
+.leaflet-canvas-wrap.editing .leaflet-interactive {
+  cursor: crosshair !important;
+}

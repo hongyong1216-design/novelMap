@@ -1,48 +1,50 @@
 import { Marker } from 'react-leaflet'
 import L from 'leaflet'
-import { Modal } from 'antd'
 import useMapZoom from '../hooks/useMapZoom'
+import { isVisibleAtZoom } from '../utils/visibilityPresets'
+import { resolveIcon } from '../utils/iconLibrary'
 
-const TYPE_COLOR = {
-  city:     '#6c5ce7',
-  building: '#a29bfe',
-  landmark: '#e8b25a',
-}
+const escapeHtml = (s = '') =>
+  String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
 
 const buildIcon = (m) => {
-  const color = TYPE_COLOR[m.type] || '#6c5ce7'
+  const visual = resolveIcon(m)
+  const name = escapeHtml(m.name)
+  let inner
+  let anchorY
+  if (visual.kind === 'emoji') {
+    inner = `<div class="novelmap-marker__emoji">${visual.char}</div>`
+    anchorY = 14
+  } else {
+    const color = visual.color || '#6c5ce7'
+    inner = `<div class="novelmap-marker__dot" style="background:${color};box-shadow:0 0 12px ${color}"></div>`
+    anchorY = 8
+  }
   return L.divIcon({
     className: 'novelmap-marker',
-    html: `<div class="novelmap-marker__dot" style="background:${color};box-shadow:0 0 12px ${color}"></div>
-           <div class="novelmap-marker__label">${m.name}</div>`,
-    iconSize: [120, 40],
-    iconAnchor: [60, 8],
+    html: `${inner}<div class="novelmap-marker__label">${name}</div>`,
+    iconSize: [120, 48],
+    iconAnchor: [60, anchorY],
   })
 }
 
-const showInfo = (m) => {
-  Modal.info({
-    title: m.name,
-    content: (
-      <div>
-        <p>类型: {m.type}</p>
-        <p>ID: {m.id}</p>
-        <p>坐标: [{m.coord.join(', ')}]</p>
-      </div>
-    ),
-  })
-}
-
-export default function WorldMarkers({ markers }) {
+export default function WorldMarkers({ markers, onMarkerClick, interactive = true }) {
   const zoom = useMapZoom()
   return markers
-    .filter((m) => zoom >= m.minZoom)
+    .filter((m) => isVisibleAtZoom(m, zoom))
     .map((m) => (
       <Marker
         key={m.id}
         position={m.coord}
         icon={buildIcon(m)}
-        eventHandlers={{ click: () => showInfo(m) }}
+        interactive={interactive}
+        eventHandlers={
+          interactive && onMarkerClick ? { click: () => onMarkerClick(m) } : {}
+        }
       />
     ))
 }

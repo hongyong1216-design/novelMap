@@ -1,0 +1,75 @@
+.zoom-hud {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 500;
+  min-width: 220px;
+  padding: 10px 14px;
+  background: rgba(20, 20, 38, 0.88);
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.zoom-hud__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.zoom-hud__zoom {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #a29bfe;
+  letter-spacing: 0.04em;
+}
+
+.zoom-hud__tier {
+  font-size: 12px;
+  color: var(--text-primary);
+  opacity: 0.85;
+}
+
+.zoom-hud__bar {
+  position: relative;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: visible;
+}
+
+.zoom-hud__bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, #6c5ce7 0%, #a29bfe 100%);
+  border-radius: 3px;
+  transition: width 0.15s ease;
+}
+
+.zoom-hud__bar-ticks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.zoom-hud__tick {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.zoom-hud__meta {
+  margin-top: 8px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  font-variant-numeric: tabular-nums;
+}

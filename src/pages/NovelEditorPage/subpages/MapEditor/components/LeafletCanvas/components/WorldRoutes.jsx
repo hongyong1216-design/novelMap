@@ -1,6 +1,7 @@
 import { Polyline } from 'react-leaflet'
 import { Modal } from 'antd'
 import useMapZoom from '../hooks/useMapZoom'
+import { isVisibleAtZoom } from '../utils/visibilityPresets'
 
 const showInfo = (t) => {
   Modal.info({
@@ -15,21 +16,22 @@ const showInfo = (t) => {
   })
 }
 
-export default function WorldRoutes({ routes }) {
+export default function WorldRoutes({ routes, interactive = true }) {
   const zoom = useMapZoom()
   return routes
-    .filter((t) => zoom >= t.minZoom)
+    .filter((t) => isVisibleAtZoom(t, zoom))
     .map((t) => (
       <Polyline
         key={t.id}
         positions={t.line}
+        interactive={interactive}
         pathOptions={{
           color: '#a29bfe',
           weight: 3,
           opacity: 0.85,
           dashArray: t.style === 'dashed' ? '10 8' : null,
         }}
-        eventHandlers={{ click: () => showInfo(t) }}
+        eventHandlers={interactive ? { click: () => showInfo(t) } : {}}
       />
     ))
 }

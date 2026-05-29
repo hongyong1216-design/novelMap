@@ -1,0 +1,33 @@
+.object-editor-modal__zoom-hint {
+  margin-bottom: 14px;
+  padding: 8px 12px;
+  background: rgba(108, 92, 231, 0.12);
+  border-radius: 6px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.object-editor-modal__zoom-hint b {
+  color: #a29bfe;
+  font-variant-numeric: tabular-nums;
+}
+
+.object-editor-modal__tier {
+  margin-left: auto;
+  font-size: 11px;
+  opacity: 0.75;
+}
+
+.object-editor-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.object-editor-modal__footer-right {
+  display: flex;
+  gap: 8px;
+}

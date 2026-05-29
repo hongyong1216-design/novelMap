@@ -1,6 +1,7 @@
 import { Marker } from 'react-leaflet'
 import L from 'leaflet'
 import useMapZoom from '../hooks/useMapZoom'
+import { isVisibleAtZoom } from '../utils/visibilityPresets'
 
 const SIZE_PX = { lg: 22, md: 16, sm: 12 }
 
@@ -14,17 +15,19 @@ const buildIcon = (lb) => {
   })
 }
 
-export default function WorldLabels({ labels }) {
+export default function WorldLabels({ labels, onLabelClick, interactive = false }) {
   const zoom = useMapZoom()
+  const canClick = interactive && Boolean(onLabelClick)
   return labels
-    .filter((lb) => zoom >= lb.minZoom)
+    .filter((lb) => isVisibleAtZoom(lb, zoom))
     .map((lb) => (
       <Marker
         key={lb.id}
         position={lb.coord}
         icon={buildIcon(lb)}
-        interactive={false}
+        interactive={canClick}
         keyboard={false}
+        eventHandlers={canClick ? { click: () => onLabelClick(lb) } : {}}
       />
     ))
 }

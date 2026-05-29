@@ -1,6 +1,7 @@
 import { Polygon } from 'react-leaflet'
 import { Modal } from 'antd'
 import useMapZoom from '../hooks/useMapZoom'
+import { isVisibleAtZoom } from '../utils/visibilityPresets'
 
 const showInfo = (r) => {
   Modal.info({
@@ -15,21 +16,22 @@ const showInfo = (r) => {
   })
 }
 
-export default function WorldRegions({ regions }) {
+export default function WorldRegions({ regions, interactive = true }) {
   const zoom = useMapZoom()
   return regions
-    .filter((r) => zoom >= r.minZoom)
+    .filter((r) => isVisibleAtZoom(r, zoom))
     .map((r) => (
       <Polygon
         key={r.id}
         positions={r.polygon}
+        interactive={interactive}
         pathOptions={{
           color: 'rgba(255, 255, 255, 0.12)',
           weight: 1,
           fillColor: '#6c5ce7',
           fillOpacity: 0.12,
         }}
-        eventHandlers={{ click: () => showInfo(r) }}
+        eventHandlers={interactive ? { click: () => showInfo(r) } : {}}
       />
     ))
 }

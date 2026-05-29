@@ -15,7 +15,7 @@ function showCellInfo(id, cell) {
   })
 }
 
-export default function GridLayer({ gridSize, cells, onCellClick }) {
+export default function GridLayer({ gridSize, cells, onCellClick, interactive = true }) {
   const makeHandler = (id, cell) => () => {
     if (onCellClick) onCellClick(id, cell || { empty: true })
     else showCellInfo(id, cell)
@@ -34,8 +34,8 @@ export default function GridLayer({ gridSize, cells, onCellClick }) {
         key={id}
         url={url}
         bounds={cellBoundsLatLng(pos.x, pos.y)}
-        interactive
-        eventHandlers={{ click: makeHandler(id, cell) }}
+        interactive={interactive}
+        eventHandlers={interactive ? { click: makeHandler(id, cell) } : {}}
         zIndex={400}
       />
     )
@@ -51,8 +51,8 @@ export default function GridLayer({ gridSize, cells, onCellClick }) {
           key={id}
           url={placeholderSvg(x, y, false)}
           bounds={cellBoundsLatLng(x, y)}
-          interactive
-          eventHandlers={{ click: makeHandler(id, null) }}
+          interactive={interactive}
+          eventHandlers={interactive ? { click: makeHandler(id, null) } : {}}
           zIndex={399}
         />
       )

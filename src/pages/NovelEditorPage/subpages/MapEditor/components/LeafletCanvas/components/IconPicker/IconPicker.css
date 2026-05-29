@@ -1,0 +1,66 @@
+.icon-picker {
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 4px 4px 4px 0;
+}
+
+.icon-picker__group {
+  margin-bottom: 10px;
+}
+
+.icon-picker__group:last-child {
+  margin-bottom: 0;
+}
+
+.icon-picker__group-label {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #a29bfe;
+  margin-bottom: 6px;
+  opacity: 0.85;
+}
+
+.icon-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+}
+
+.icon-picker__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  min-height: 36px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: inherit;
+}
+
+.icon-picker__item:hover {
+  background: rgba(108, 92, 231, 0.18);
+  border-color: rgba(108, 92, 231, 0.5);
+}
+
+.icon-picker__item--selected {
+  background: rgba(108, 92, 231, 0.32);
+  border-color: #6c5ce7;
+  box-shadow: 0 0 0 1px rgba(108, 92, 231, 0.4) inset;
+}
+
+.icon-picker__dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+}
+
+.icon-picker__emoji {
+  font-size: 18px;
+  line-height: 1;
+}
