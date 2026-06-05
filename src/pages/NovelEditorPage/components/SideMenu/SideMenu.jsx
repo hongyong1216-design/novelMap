@@ -2,6 +2,7 @@ import { Menu } from 'antd'
 import { useNavigate, useMatch, useParams } from 'react-router-dom'
 import {
   EditOutlined,
+  ReadOutlined,
   GlobalOutlined,
   ApartmentOutlined,
   TeamOutlined,
@@ -11,6 +12,7 @@ import './SideMenu.css'
 
 const items = [
   { key: 'content', icon: <EditOutlined />, label: '内容编辑' },
+  { key: 'background', icon: <ReadOutlined />, label: '故事背景' },
   { key: 'map', icon: <GlobalOutlined />, label: '地图编辑' },
   { key: 'factions', icon: <ApartmentOutlined />, label: '势力编辑' },
   { key: 'characters', icon: <TeamOutlined />, label: '角色档案' },

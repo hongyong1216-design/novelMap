@@ -1,0 +1,176 @@
+.card-edit__modal .floating-modal__body {
+  background-image: radial-gradient(
+    circle at 50% 0%,
+    color-mix(in srgb, var(--accent) 8%, transparent) 0%,
+    transparent 70%
+  );
+}
+
+.card-edit__title {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.card-edit__tag {
+  --cat-color: var(--accent-light);
+  margin-right: 0.75rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--cat-color);
+  background: color-mix(in srgb, var(--cat-color) 18%, transparent);
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+}
+
+.card-edit__body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem 2rem 2rem;
+  overflow-y: auto;
+}
+
+.card-edit__field {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.card-edit__label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.card-edit__title-input {
+  width: 100%;
+  padding: 0 0 0.75rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  outline: none;
+}
+
+.card-edit__title-input::placeholder {
+  color: var(--text-muted);
+}
+
+.card-edit__textarea {
+  flex: 1;
+  width: 100%;
+  min-height: 200px;
+  padding: 0;
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  color: rgba(232, 232, 240, 0.9);
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+}
+
+.card-edit__textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.card-edit__footer-extra {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.card-edit__word-count {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* === 阅读模式 === */
+.card-view {
+  height: 100%;
+  overflow-y: auto;
+  padding: 2.25rem 2.5rem 2.75rem;
+}
+
+/* 限定正文宽度居中，保证长文的阅读舒适度 */
+.card-view__inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.card-view__eyebrow {
+  display: block;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cat-color, var(--accent-light));
+}
+
+.card-view__title {
+  margin: 0.5rem 0 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+.card-view__divider {
+  height: 1px;
+  margin: 1.25rem 0 1.75rem;
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--cat-color) 55%, transparent),
+    transparent
+  );
+}
+
+/* 【小节】标题：去掉方括号，以分类色竖条强调 */
+.card-view__section {
+  margin: 2rem 0 0.9rem;
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--cat-color, var(--accent));
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.card-view__para {
+  margin: 0 0 1.1rem;
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 1.0625rem;
+  line-height: 1.95;
+  color: rgba(232, 232, 240, 0.92);
+}
+
+/* 有序列表项：缩进区分层级 */
+.card-view__para--list {
+  padding-left: 1.25rem;
+  color: rgba(232, 232, 240, 0.82);
+}
+
+.card-view__empty {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 1rem;
+  color: var(--text-muted);
+}

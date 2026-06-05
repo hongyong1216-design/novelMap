@@ -1,0 +1,102 @@
+.bg-card {
+  --cat-color: var(--accent-light);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 200px;
+  padding: 1.25rem;
+  text-align: left;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-family: inherit;
+  overflow: hidden;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s,
+    background-color 0.2s;
+}
+
+/* 顶部分类色条 */
+.bg-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--cat-color);
+  opacity: 0.85;
+}
+
+.bg-card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--cat-color) 50%, transparent);
+  background-color: color-mix(in srgb, var(--cat-color) 6%, var(--bg-card));
+  box-shadow: 0 16px 32px -14px rgba(0, 0, 0, 0.55);
+}
+
+.bg-card__head {
+  display: flex;
+  align-items: center;
+}
+
+.bg-card__tag {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--cat-color);
+  background: color-mix(in srgb, var(--cat-color) 15%, transparent);
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+}
+
+.bg-card__edit {
+  margin-left: auto;
+  display: inline-flex;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.bg-card:hover .bg-card__edit {
+  opacity: 1;
+  color: var(--cat-color);
+}
+
+.bg-card__title {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.bg-card__excerpt {
+  flex: 1;
+  margin: 0;
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  /* 多行省略：内容缩略 */
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.bg-card__foot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bg-card__cat-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}

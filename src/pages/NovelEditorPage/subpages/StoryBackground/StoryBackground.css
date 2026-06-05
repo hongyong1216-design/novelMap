@@ -1,0 +1,153 @@
+.story-bg {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  padding: 2.5rem 3rem 4rem;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+.story-bg__bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.25;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.story-bg > *:not(.story-bg__bg-grid) {
+  position: relative;
+  z-index: 1;
+}
+
+/* === Header === */
+.story-bg__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+}
+
+.story-bg__eyebrow {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent-light);
+}
+
+.story-bg__title {
+  margin: 0.35rem 0 0.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.story-bg__subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.story-bg__filter {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* === Section === */
+.story-bg__section {
+  margin-bottom: 2.5rem;
+}
+
+.story-bg__section-head {
+  --cat-color: var(--accent-light);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.story-bg__section-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 2px;
+  background: var(--cat-color);
+  box-shadow: 0 0 10px var(--cat-color);
+}
+
+.story-bg__section-title {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.story-bg__section-code {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
+  color: var(--cat-color);
+  opacity: 0.8;
+}
+
+.story-bg__section-count {
+  margin-left: auto;
+  padding: 0.1rem 0.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border-radius: 3px;
+}
+
+/* === Grid === */
+.story-bg__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+/* === Add Card === */
+.story-bg__add-card {
+  --cat-color: var(--accent-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 200px;
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.85rem;
+  transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+}
+
+.story-bg__add-card:hover {
+  color: var(--cat-color);
+  border-color: color-mix(in srgb, var(--cat-color) 50%, transparent);
+  background-color: color-mix(in srgb, var(--cat-color) 6%, transparent);
+}
+
+.story-bg__add-card .anticon {
+  font-size: 1.25rem;
+}
+
+@media (max-width: 720px) {
+  .story-bg {
+    padding: 1.5rem 1.25rem 3rem;
+  }
+}

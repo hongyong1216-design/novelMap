@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom'
 import NovelEditorPage from './index'
 import contentRoute from './subpages/ContentEditor/route'
+import backgroundRoute from './subpages/StoryBackground/route'
 import mapRoute from './subpages/MapEditor/route'
 import factionRoute from './subpages/FactionEditor/route'
 import characterRoute from './subpages/CharacterProfile/route'
@@ -12,6 +13,7 @@ export default {
   children: [
     { index: true, element: <Navigate to="content" replace /> },
     contentRoute,
+    backgroundRoute,
     mapRoute,
     factionRoute,
     characterRoute,
