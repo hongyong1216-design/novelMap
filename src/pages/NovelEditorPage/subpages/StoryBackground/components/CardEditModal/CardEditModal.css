@@ -110,7 +110,7 @@
 
 /* 限定正文宽度居中，保证长文的阅读舒适度 */
 .card-view__inner {
-  max-width: 720px;
+  max-width: 840px;
   margin: 0 auto;
 }
 
@@ -167,6 +167,35 @@
 .card-view__para--list {
   padding-left: 1.25rem;
   color: rgba(232, 232, 240, 0.82);
+}
+
+/* 精细条目「名称：描述」：分类色竖条 + 淡底，名称高亮独立成点 */
+.card-view__term {
+  margin: 0 0 0.85rem;
+  padding: 0.7rem 1.1rem;
+  border-radius: 6px;
+  border-left: 2px solid
+    color-mix(in srgb, var(--cat-color, var(--accent)) 65%, transparent);
+  background: color-mix(in srgb, var(--cat-color, var(--accent)) 7%, transparent);
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 1.0625rem;
+  line-height: 1.9;
+}
+
+.card-view__term-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  color: var(--cat-color, var(--accent-light));
+}
+
+.card-view__term-name::after {
+  content: '：';
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.card-view__term-desc {
+  color: rgba(232, 232, 240, 0.92);
 }
 
 .card-view__empty {

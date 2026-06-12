@@ -7,20 +7,27 @@ import './CardEditModal.css'
 
 const countWords = (text) => text.replace(/\s/g, '').length
 
-// 把 content 解析为段落块：空行/换行分段，识别【小节】标题与有序列表项
+// 行首「短名称：描述」识别为精细条目（名称 ≤16 字、不含标点与空格，冒号后须有内容）
+const TERM_RE = /^([^，。；！？、,.;!?\s：:]{2,16})[：:]\s*(.+)$/
+
+// 把 content 解析为块：空行/换行分段，识别【小节】标题、精细条目与有序列表项
 const parseBlocks = (content) =>
   (content || '')
     .split(/\n+/)
     .map((s) => s.trim())
     .filter(Boolean)
     .map((text, i) => {
-      const isHeading = /^【.+】$/.test(text)
-      const isList = /^\d+[.、]/.test(text)
-      return {
-        key: i,
-        text: isHeading ? text.replace(/^【|】$/g, '') : text,
-        kind: isHeading ? 'heading' : isList ? 'list' : 'para',
+      if (/^【.+】$/.test(text)) {
+        return { key: i, kind: 'heading', text: text.replace(/^【|】$/g, '') }
       }
+      const term = text.match(TERM_RE)
+      if (term) {
+        return { key: i, kind: 'term', term: term[1], text: term[2] }
+      }
+      if (/^\d+[.、]/.test(text)) {
+        return { key: i, kind: 'list', text }
+      }
+      return { key: i, kind: 'para', text }
     })
 
 // 背景卡片浮窗：默认「阅读模式」舒适查看，点「编辑」切到表单编辑
@@ -90,8 +97,8 @@ export default function CardEditModal({ open, card, onClose, onSave, onDelete })
       open={open}
       onClose={onClose}
       title={title}
-      defaultWidth={880}
-      defaultHeight={760}
+      defaultWidth={1040}
+      defaultHeight={860}
       className="card-edit__modal"
       footerExtra={footerExtra}
       {...modeProps}
@@ -139,6 +146,11 @@ export default function CardEditModal({ open, card, onClose, onSave, onDelete })
                   <h2 key={b.key} className="card-view__section">
                     {b.text}
                   </h2>
+                ) : b.kind === 'term' ? (
+                  <p key={b.key} className="card-view__term">
+                    <span className="card-view__term-name">{b.term}</span>
+                    <span className="card-view__term-desc">{b.text}</span>
+                  </p>
                 ) : (
                   <p
                     key={b.key}
