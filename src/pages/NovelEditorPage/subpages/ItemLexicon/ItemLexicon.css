@@ -1,0 +1,152 @@
+.item-lex {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  padding: 2.5rem 3rem 4rem;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+.item-lex__bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.25;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.item-lex > *:not(.item-lex__bg-grid) {
+  position: relative;
+  z-index: 1;
+}
+
+/* === Header === */
+.item-lex__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.item-lex__eyebrow {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent-light);
+}
+
+.item-lex__title {
+  margin: 0.35rem 0 0.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.item-lex__subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.item-lex__search {
+  width: 280px;
+  max-width: 100%;
+}
+
+/* === Toolbar：分类筛选 + 排序 === */
+.item-lex__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.item-lex__filter {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.item-lex__sort {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.item-lex__sort-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* === Grid === */
+.item-lex__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+/* === 新建物品卡片 === */
+.item-lex__add-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 260px;
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+}
+
+.item-lex__add-card:hover {
+  color: var(--accent-light);
+  border-color: color-mix(in srgb, var(--accent-light) 50%, transparent);
+  background-color: color-mix(in srgb, var(--accent-light) 6%, transparent);
+}
+
+.item-lex__add-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  font-size: 1.35rem;
+  border-radius: 50%;
+  background: var(--bg-card);
+  transition: transform 0.2s, background-color 0.2s, color 0.2s;
+}
+
+.item-lex__add-card:hover .item-lex__add-icon {
+  transform: scale(1.1);
+  background: var(--accent);
+  color: #fff;
+}
+
+@media (max-width: 720px) {
+  .item-lex {
+    padding: 1.5rem 1.25rem 3rem;
+  }
+
+  .item-lex__search {
+    width: 100%;
+  }
+}
