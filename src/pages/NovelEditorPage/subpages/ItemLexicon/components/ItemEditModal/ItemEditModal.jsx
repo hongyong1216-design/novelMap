@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Segmented, Select, Button } from 'antd'
 import {
   DeleteOutlined,
@@ -6,10 +6,10 @@ import {
   DatabaseOutlined,
   ThunderboltOutlined,
   SafetyOutlined,
-  ShrinkOutlined,
+  CloseOutlined,
 } from '@ant-design/icons'
 import FloatingModal from '../../../../../../components/FloatingModal/FloatingModal'
-import { CATEGORIES, CATEGORY_MAP, RARITIES } from '../../data/items'
+import { CATEGORIES, CATEGORY_MAP, RARITIES, RARITY_MAP } from '../../data/items'
 import './ItemEditModal.css'
 
 // 衍生节点图标映射（设计稿用 material-symbols，这里改用 antd 图标）
@@ -36,7 +36,7 @@ function SmartImg({ src, alt, imgClass, phClass }) {
 
 // 物品浮窗：
 //   tree 模式 = 演化树状图（根物品 → 衍生组件 → 孙节点），默认查看视图
-//             点击任意节点可放大查看完整文本，再点缩小（遮罩 / 按钮 / Esc）
+//             点击任意节点弹出「资产详情」浮层（关联 / 主体 / 技术说明三栏），点遮罩 / 关闭 / Esc 收起
 //   edit 模式 = 编辑核心（复用表单编辑根物品的属性）
 // 父级通过 key={item.id} 强制重建，使 draft / mode 每次以最新 item 初始化
 export default function ItemEditModal({ open, item, onClose, onSave, onDelete }) {
@@ -57,7 +57,6 @@ export default function ItemEditModal({ open, item, onClose, onSave, onDelete })
   )
   // 被放大查看的节点（标准化对象）；null 表示未放大
   const [focused, setFocused] = useState(null)
-  const treeRef = useRef(null)
 
   // 放大查看时支持 Esc 缩小
   useEffect(() => {
@@ -76,51 +75,77 @@ export default function ItemEditModal({ open, item, onClose, onSave, onDelete })
   const update = (patch) => setDraft((d) => ({ ...d, ...patch }))
   const derivatives = item.derivatives ?? []
   // 水平分叉横条只连接首尾子节点的中心：n 个节点时左右内缩 50/n %
+  // 仅在单行（≤3 个）布局下渲染；更多节点会换行成网格，此时横条无意义
   const hbarInset =
-    derivatives.length > 1 ? `${50 / derivatives.length}%` : null
+    derivatives.length > 1 && derivatives.length <= 3
+      ? `${50 / derivatives.length}%`
+      : null
 
-  // 把不同层级的节点标准化为放大卡所需的数据
+  // 把不同层级的节点标准化为「资产详情」浮层所需的数据：
+  //   eyebrow 类型标签 / name 主标题 / subtitle 副标题 / desc 架构概述
+  //   badge 角标 / progress 同步度 / meta 右栏参数行 / related 左栏关联资产
   const focusRoot = () =>
     setFocused({
       color: cat?.color,
+      eyebrow: 'Root Asset // 核心资产',
       badge: 'Root Item',
       image: item.image,
       name: item.name || '未命名',
       subtitle: item.alias ? `${item.alias} // 核心架构` : '核心架构',
       desc: item.desc || '暂无描述…',
+      meta: [
+        cat && { label: '分类', value: cat.label },
+        RARITY_MAP[item.rarity] && {
+          label: '稀有度',
+          value: RARITY_MAP[item.rarity].label,
+        },
+        { label: '衍生分支', value: String(derivatives.length) },
+      ].filter(Boolean),
+      related: derivatives.map((d) => ({
+        key: d.id ?? d.name,
+        eyebrow: d.id ? `ID ${d.id}` : '衍生组件',
+        color: d.color,
+        icon: d.icon,
+        image: d.image,
+        name: d.name,
+        desc: d.desc,
+      })),
     })
   const focusDerivative = (d) =>
     setFocused({
       color: d.color,
+      eyebrow: d.id ? `Derivative // ${d.id}` : 'Derivative // 衍生组件',
       icon: d.icon,
-      id: d.id,
       image: d.image,
       name: d.name,
       subtitle: [d.alias, d.role].filter(Boolean).join(' // '),
       desc: d.desc || '暂无描述…',
       progress: d.progress,
-      children: d.children,
+      meta: [
+        d.id && { label: 'ID', value: d.id },
+        d.role && { label: '角色', value: d.role },
+        typeof d.progress === 'number' && {
+          label: '完成度',
+          value: `${Math.round(d.progress * 100)}%`,
+        },
+      ].filter(Boolean),
+      related: (d.children ?? []).map((g) => ({
+        key: g.name,
+        eyebrow: g.alias || '子组件',
+        name: g.name,
+        desc: g.desc,
+      })),
     })
   const focusLeaf = (g, color) =>
     setFocused({
       color,
+      eyebrow: 'Leaf Component // 末端组件',
       name: g.name,
       subtitle: g.alias,
       desc: g.desc || '该组件暂无更多文本信息。',
+      meta: [{ label: '层级', value: '末端组件' }],
+      related: [],
     })
-
-  // 视差：鼠标在画布上移动时，整棵树轻微反向平移（直接改 style，避免频繁 setState）
-  const handleParallax = (e) => {
-    const el = treeRef.current
-    if (!el) return
-    const r = el.getBoundingClientRect()
-    const dx = (e.clientX - (r.left + r.width / 2)) / r.width
-    const dy = (e.clientY - (r.top + r.height / 2)) / r.height
-    el.style.transform = `translate(${dx * -14}px, ${dy * -10}px)`
-  }
-  const resetParallax = () => {
-    if (treeRef.current) treeRef.current.style.transform = 'translate(0, 0)'
-  }
 
   // 导出该物品及其演化架构为 JSON 文件
   const handleExport = () => {
@@ -278,13 +303,9 @@ export default function ItemEditModal({ open, item, onClose, onSave, onDelete })
         </div>
       ) : (
         <div className="item-tree-wrap">
-          <div
-            className="item-tree"
-            onMouseMove={handleParallax}
-            onMouseLeave={resetParallax}
-          >
+          <div className="item-tree">
             <div className="item-tree__grid-bg" />
-            <div className="item-tree__canvas" ref={treeRef}>
+            <div className="item-tree__canvas">
               {/* === 根节点 === */}
               <div className="item-tree__root-wrap">
                 <div
@@ -404,87 +425,148 @@ export default function ItemEditModal({ open, item, onClose, onSave, onDelete })
             </div>
           </div>
 
-          {/* === 放大查看浮层 === */}
+          {/* === 资产详情浮层（点击节点弹出） === */}
           {focused && (
             <div className="item-focus" onClick={() => setFocused(null)}>
               <div
-                className="item-focus__card"
-                style={{ '--focus-color': focused.color || 'var(--accent-light)' }}
+                className="item-focus__panel"
+                style={{
+                  '--focus-color': focused.color || 'var(--accent-light)',
+                }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <button
-                  type="button"
-                  className="item-focus__shrink"
-                  onClick={() => setFocused(null)}
-                  aria-label="缩小"
-                  title="缩小（Esc）"
-                >
-                  <ShrinkOutlined />
-                </button>
-
-                {focused.image && (
-                  <div className="item-focus__media">
-                    <SmartImg
-                      key={focused.image}
-                      src={focused.image}
-                      alt={focused.name}
-                      imgClass="item-focus__img"
-                      phClass="item-focus__ph"
-                    />
-                    {focused.badge && (
-                      <span className="item-focus__badge">{focused.badge}</span>
-                    )}
+                <header className="item-focus__header">
+                  <div className="item-focus__heading">
+                    <span className="item-focus__eyebrow">
+                      {focused.eyebrow || 'Asset Detail // 资产详情'}
+                    </span>
+                    <h2 className="item-focus__title">{focused.name}</h2>
                   </div>
-                )}
+                  <button
+                    type="button"
+                    className="item-focus__close"
+                    onClick={() => setFocused(null)}
+                    aria-label="关闭"
+                    title="关闭（Esc）"
+                  >
+                    <CloseOutlined />
+                  </button>
+                </header>
 
-                <div className="item-focus__body">
-                  <div className="item-focus__head">
-                    {focused.icon && (
-                      <span className="item-focus__icon">
-                        {DERIVATIVE_ICONS[focused.icon] ?? <DatabaseOutlined />}
-                      </span>
-                    )}
-                    <h3 className="item-focus__name">{focused.name}</h3>
-                    {focused.id && (
-                      <span className="item-focus__id">ID: {focused.id}</span>
-                    )}
-                  </div>
-                  {focused.subtitle && (
-                    <p className="item-focus__sub">{focused.subtitle}</p>
-                  )}
-                  <div className="item-focus__divider" />
-                  <p className="item-focus__desc">{focused.desc}</p>
-
-                  {typeof focused.progress === 'number' && (
-                    <div className="item-focus__progress-row">
-                      <div className="item-focus__progress">
-                        <span
+                <div className="item-focus__layout">
+                  {/* 左：关联资产 */}
+                  <aside className="item-focus__aside">
+                    <h3 className="item-focus__section-label">
+                      关联资产 / Related
+                    </h3>
+                    {focused.related?.length > 0 ? (
+                      focused.related.map((r) => (
+                        <div
+                          className="item-focus__link"
+                          key={r.key}
                           style={{
-                            width: `${Math.round(focused.progress * 100)}%`,
+                            '--link-color': r.color || 'var(--accent-light)',
                           }}
-                        />
-                      </div>
-                      <span className="item-focus__progress-val">
-                        {Math.round(focused.progress * 100)}%
-                      </span>
-                    </div>
-                  )}
-
-                  {focused.children?.length > 0 && (
-                    <div className="item-focus__children">
-                      <span className="item-focus__children-label">衍生子项</span>
-                      {focused.children.map((g) => (
-                        <div className="item-focus__child" key={g.name}>
-                          <span className="item-focus__child-name">{g.name}</span>
-                          {g.alias && (
-                            <span className="item-focus__child-alias">
-                              {g.alias}
+                        >
+                          <div className="item-focus__link-media">
+                            <SmartImg
+                              key={r.image}
+                              src={r.image}
+                              alt={r.name}
+                              imgClass="item-focus__link-img"
+                              phClass="item-focus__link-ph"
+                            />
+                          </div>
+                          <div className="item-focus__link-info">
+                            <span className="item-focus__link-eyebrow">
+                              {r.icon && (
+                                <span className="item-focus__link-icon">
+                                  {DERIVATIVE_ICONS[r.icon] ?? (
+                                    <DatabaseOutlined />
+                                  )}
+                                </span>
+                              )}
+                              {r.eyebrow}
                             </span>
-                          )}
+                            <h4 className="item-focus__link-name">{r.name}</h4>
+                            {r.desc && (
+                              <p className="item-focus__link-desc">{r.desc}</p>
+                            )}
+                          </div>
                         </div>
-                      ))}
+                      ))
+                    ) : (
+                      <p className="item-focus__aside-empty">暂无关联组件</p>
+                    )}
+                  </aside>
+
+                  {/* 中：主体大图 + HUD */}
+                  <section className="item-focus__stage">
+                    <div className="item-focus__media scan-line">
+                      <SmartImg
+                        key={focused.image}
+                        src={focused.image}
+                        alt={focused.name}
+                        imgClass="item-focus__img"
+                        phClass="item-focus__ph"
+                      />
+                      <div className="item-focus__hud">
+                        <span className="item-focus__hud-tag">
+                          {typeof focused.progress === 'number'
+                            ? `SYNC ${Math.round(focused.progress * 100)}%`
+                            : focused.badge || 'ACTIVE'}
+                        </span>
+                      </div>
+                      <div className="item-focus__stage-foot">
+                        <h3 className="item-focus__stage-name">{focused.name}</h3>
+                        {focused.subtitle && (
+                          <div className="item-focus__stage-meta">
+                            <span className="item-focus__status">
+                              <i className="item-focus__status-dot" />
+                              {focused.subtitle}
+                            </span>
+                          </div>
+                        )}
+                        {typeof focused.progress === 'number' && (
+                          <div className="item-focus__stage-progress">
+                            <span
+                              style={{
+                                width: `${Math.round(focused.progress * 100)}%`,
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
+                  </section>
+
+                  {/* 右：技术说明 */}
+                  <section className="item-focus__specs">
+                    <div className="item-focus__spec-group">
+                      <h3 className="item-focus__section-label item-focus__section-label--accent">
+                        技术说明 / Specs
+                      </h3>
+                      <div className="item-focus__spec-block">
+                        <h4 className="item-focus__spec-title">架构概述</h4>
+                        <p className="item-focus__spec-text">{focused.desc}</p>
+                      </div>
+                    </div>
+
+                    {focused.meta?.length > 0 && (
+                      <div className="item-focus__meta">
+                        {focused.meta.map((m) => (
+                          <div className="item-focus__meta-row" key={m.label}>
+                            <span className="item-focus__meta-label">
+                              {m.label}
+                            </span>
+                            <span className="item-focus__meta-value">
+                              {m.value}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </section>
                 </div>
               </div>
             </div>

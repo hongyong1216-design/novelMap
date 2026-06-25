@@ -1,0 +1,60 @@
+.atree-node__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 10px;
+  height: 32px;
+  cursor: pointer;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  user-select: none;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.atree-node__row:hover {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--text-primary);
+}
+
+.atree-node__row.is-selected {
+  background: color-mix(in srgb, var(--kind-color, var(--accent)) 22%, transparent);
+  color: var(--text-primary);
+}
+
+.atree-node__caret {
+  flex: 0 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.atree-node__dot {
+  flex: 0 0 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--kind-color, var(--accent));
+  box-shadow: 0 0 6px color-mix(in srgb, var(--kind-color, var(--accent)) 60%, transparent);
+}
+
+.atree-node__title {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.atree-node__sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 子节点层左侧的层级引导线 */
+.atree-node__children {
+  position: relative;
+}

@@ -1,0 +1,47 @@
+.ability-tree {
+  display: flex;
+  height: 100%;
+  background: var(--bg-primary);
+}
+
+/* ===== 左侧树 ===== */
+.ability-tree__sidebar {
+  flex: 0 0 340px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  background: var(--bg-nav);
+  overflow: hidden;
+}
+
+.ability-tree__head {
+  flex: 0 0 auto;
+  padding: 20px 16px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ability-tree__eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+}
+
+.ability-tree__heading {
+  margin-top: 4px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ability-tree__tree {
+  flex: 1;
+  overflow: auto;
+  padding: 10px 8px;
+}
+
+/* ===== 右侧详情 ===== */
+.ability-tree__detail {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}

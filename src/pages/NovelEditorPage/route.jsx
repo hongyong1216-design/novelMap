@@ -7,6 +7,7 @@ import mapRoute from './subpages/MapEditor/route'
 import factionRoute from './subpages/FactionEditor/route'
 import characterRoute from './subpages/CharacterProfile/route'
 import storylineRoute from './subpages/StorylineEditor/route'
+import abilityRoute from './subpages/AbilityTree/route'
 
 export default {
   path: '/editor/:novelId',
@@ -20,5 +21,6 @@ export default {
     factionRoute,
     characterRoute,
     storylineRoute,
+    abilityRoute,
   ],
 }
