@@ -15,9 +15,18 @@ export default function AbilityTree() {
   const [tree, setTree] = useState(initialAbilityTree)
   const [selectedId, setSelectedId] = useState('root')
   const [mode, setMode] = useState('view')
-  // 默认展开根、两大纲目与两大源（天痕/心铸）
+  // 默认展开根、两大纲目与两大源（天痕/心铸），及心铸的技法纲/心源纲
   const [expanded, setExpanded] = useState(
-    () => new Set(['root', 'sec-realm', 'sec-veins', 'src-tianhen', 'src-xinzhu']),
+    () =>
+      new Set([
+        'root',
+        'sec-realm',
+        'sec-veins',
+        'src-tianhen',
+        'src-xinzhu',
+        'sec-xz-jifa',
+        'sec-xz-xinyuan',
+      ]),
   )
   const idRef = useRef(1000)
 
