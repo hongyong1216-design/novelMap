@@ -29,6 +29,18 @@ export default function ChapterListModal({
       destroyOnClose
     >
       <ul className="chapter-list-modal__list">
+        {chapters.length === 0 && (
+          <li
+            className="chapter-list-modal__row"
+            style={{
+              padding: '32px 16px',
+              textAlign: 'center',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            暂无章节 · 在编辑器中开始书写
+          </li>
+        )}
         {chapters.map((c) => {
           const isCurrent = c.id === currentChapterId
           return (
