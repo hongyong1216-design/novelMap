@@ -1,6 +1,6 @@
 .zoom-hud {
   position: absolute;
-  left: 16px;
+  left: 44px; /* 让开左缘 28px 纬度标尺 */
   bottom: 16px;
   z-index: 500;
   min-width: 220px;

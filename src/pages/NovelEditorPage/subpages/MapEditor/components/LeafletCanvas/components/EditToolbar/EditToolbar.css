@@ -1,7 +1,7 @@
 .edit-toolbar {
   position: absolute;
   top: 16px;
-  left: 16px;
+  left: 44px; /* 让开左缘 28px 纬度标尺 */
   z-index: 500;
   min-width: 200px;
   padding: 10px 14px;

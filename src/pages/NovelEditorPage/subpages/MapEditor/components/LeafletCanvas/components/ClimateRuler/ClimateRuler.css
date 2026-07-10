@@ -1,0 +1,45 @@
+/* 左缘纬度标尺: 水平贴左缘固定, 垂直随地图缩放 (top/height 由 JS 按地图投影算出) */
+.climate-ruler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 28px; /* 较原色条更窄, 约减半 */
+  z-index: 480;
+  overflow: hidden; /* 超出视口的带 (放大时) 裁掉 */
+  pointer-events: none; /* 不接管鼠标, 点击穿透到地图 */
+  user-select: none;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.45);
+}
+
+.climate-ruler__band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+/* 带名竖排, 居中于颜色块 */
+.climate-ruler__name {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  text-shadow:
+    0 0 4px rgba(0, 0, 0, 0.9),
+    0 1px 2px rgba(0, 0, 0, 1);
+}
+
+/* 屏幕上很矮的带 (缩小时的 1 格带) 用小字号 */
+.climate-ruler__name--thin {
+  font-size: 10px;
+  letter-spacing: 0;
+}

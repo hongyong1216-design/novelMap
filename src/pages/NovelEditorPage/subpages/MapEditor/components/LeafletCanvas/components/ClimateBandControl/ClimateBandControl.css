@@ -1,0 +1,55 @@
+/* 右下角气候带控件 (其余三角: 左上 EditToolbar / 右上 GridSize / 左下 ZoomHUD) */
+.climate-band-control {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 500;
+  min-width: 180px;
+  padding: 10px 14px;
+  background: rgba(20, 20, 38, 0.88);
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.climate-band-control__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.climate-band-control__label {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #a29bfe;
+  opacity: 0.85;
+}
+
+.climate-band-control__body {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: opacity 0.2s ease;
+}
+
+.climate-band-control__body--off {
+  opacity: 0.4;
+}
+
+.climate-band-control__opacity-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+
+.climate-band-control__body .ant-slider {
+  flex: 1;
+  margin: 0;
+}

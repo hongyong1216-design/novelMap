@@ -2,9 +2,9 @@
 // 改变 gridSize 时世界总尺寸线性扩展: worldSize = gridSize * PX_PER_CELL
 export const PX_PER_CELL = 4096
 
-export const DEFAULT_GRID_SIZE = 8
+export const DEFAULT_GRID_SIZE = 32
 export const MIN_GRID_SIZE = 1
-export const MAX_GRID_SIZE = 32
+export const MAX_GRID_SIZE = 64
 
 export const worldSizeOf = (gridSize) => gridSize * PX_PER_CELL
 

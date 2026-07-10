@@ -5,6 +5,9 @@ import { Modal, message } from 'antd'
 import 'leaflet/dist/leaflet.css'
 import GridLayer from './components/GridLayer'
 import GridSizeControl from './components/GridSizeControl'
+import ClimateBands from './components/ClimateBands'
+import ClimateRuler from './components/ClimateRuler/ClimateRuler'
+import ClimateBandControl from './components/ClimateBandControl/ClimateBandControl'
 import WorldRegions from './components/WorldRegions'
 import WorldRoutes from './components/WorldRoutes'
 import WorldMarkers from './components/WorldMarkers'
@@ -52,12 +55,24 @@ function MapClickHandler({ onClick }) {
   return null
 }
 
+// 把 map 实例上抛给外层, 供屏幕固定的 ClimateRuler 做坐标投影
+function MapReady({ onReady }) {
+  const map = useMap()
+  useEffect(() => {
+    onReady(map)
+  }, [map, onReady])
+  return null
+}
+
 export default function LeafletCanvas() {
   const [gridSize, setGridSize] = useState(DEFAULT_GRID_SIZE)
   const [cells, setCells] = useState(demoWorld.cells)
   const [zoom, setZoom] = useState(-4)
   const [editMode, setEditMode] = useState('idle')
   const [editorState, setEditorState] = useState(null)
+  const [climateVisible, setClimateVisible] = useState(true)
+  const [climateOpacity, setClimateOpacity] = useState(0.85)
+  const [mapInstance, setMapInstance] = useState(null)
   const fileInputRef = useRef(null)
   const {
     novelId,
@@ -239,8 +254,11 @@ export default function LeafletCanvas() {
       >
         <MapBoundsUpdater worldSize={worldSize} />
         <ZoomReporter onZoom={setZoom} />
+        <MapReady onReady={setMapInstance} />
         <MapClickHandler onClick={handleMapClick} />
         <GridLayer gridSize={gridSize} cells={cells} interactive={!isAdding} />
+
+        <ClimateBands worldSize={worldSize} visible={climateVisible} opacity={climateOpacity} />
 
         <WorldRegions regions={world.regions} interactive={!isAdding} />
         <WorldRoutes  routes={world.routes}  interactive={!isAdding} />
@@ -255,6 +273,13 @@ export default function LeafletCanvas() {
           onLabelClick={isAdding ? null : handleLabelClick}
         />
       </MapContainer>
+
+      <ClimateRuler
+        map={mapInstance}
+        worldSize={worldSize}
+        visible={climateVisible}
+        opacity={climateOpacity}
+      />
 
       <EditToolbar
         editMode={editMode}
@@ -275,6 +300,13 @@ export default function LeafletCanvas() {
         onChange={handleGridSizeChange}
       />
       <ZoomHUD zoom={zoom} />
+
+      <ClimateBandControl
+        visible={climateVisible}
+        opacity={climateOpacity}
+        onVisibleChange={setClimateVisible}
+        onOpacityChange={setClimateOpacity}
+      />
 
       <ObjectEditorModal
         open={Boolean(editorState)}
