@@ -15,6 +15,7 @@ import WorldLabels from './components/WorldLabels'
 import ZoomHUD from './components/ZoomHUD/ZoomHUD'
 import EditToolbar from './components/EditToolbar/EditToolbar'
 import ObjectEditorModal from './components/ObjectEditorModal/ObjectEditorModal'
+import CellPromptModal from './components/CellPromptModal/CellPromptModal'
 import useWorldData from './hooks/useWorldData'
 import { demoWorld } from './data/demoWorld'
 import { DEFAULT_GRID_SIZE, parseCellId, worldSizeOf } from './utils/grid'
@@ -73,6 +74,8 @@ export default function LeafletCanvas() {
   const [climateVisible, setClimateVisible] = useState(true)
   const [climateOpacity, setClimateOpacity] = useState(0.85)
   const [mapInstance, setMapInstance] = useState(null)
+  // 点击格子弹出的 AI 生图助手 (提示词 + 邻居重叠参考图)
+  const [promptCell, setPromptCell] = useState(null)
   const fileInputRef = useRef(null)
   const {
     novelId,
@@ -121,6 +124,10 @@ export default function LeafletCanvas() {
       initialValues: null,
       targetId: null,
     })
+  }
+
+  const handleCellClick = (id, cell) => {
+    setPromptCell({ id, cell })
   }
 
   const handleMarkerClick = (m) => {
@@ -256,7 +263,12 @@ export default function LeafletCanvas() {
         <ZoomReporter onZoom={setZoom} />
         <MapReady onReady={setMapInstance} />
         <MapClickHandler onClick={handleMapClick} />
-        <GridLayer gridSize={gridSize} cells={cells} interactive={!isAdding} />
+        <GridLayer
+          gridSize={gridSize}
+          cells={cells}
+          interactive={!isAdding}
+          onCellClick={handleCellClick}
+        />
 
         <ClimateBands worldSize={worldSize} visible={climateVisible} opacity={climateOpacity} />
 
@@ -317,6 +329,14 @@ export default function LeafletCanvas() {
         onOk={handleEditorOk}
         onCancel={() => setEditorState(null)}
         onDelete={editorState?.mode === 'edit' ? handleEditorDelete : undefined}
+      />
+
+      <CellPromptModal
+        open={Boolean(promptCell)}
+        cellId={promptCell?.id}
+        cell={promptCell?.cell}
+        cells={cells}
+        onClose={() => setPromptCell(null)}
       />
     </div>
   )

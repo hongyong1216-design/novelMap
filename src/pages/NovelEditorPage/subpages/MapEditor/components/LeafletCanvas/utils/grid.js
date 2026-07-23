@@ -1,12 +1,18 @@
 // 单格物理尺寸 (虚拟像素), 固定不变
-// 改变 gridSize 时世界总尺寸线性扩展: worldSize = gridSize * PX_PER_CELL
 export const PX_PER_CELL = 4096
+
+// 相邻格重叠率 (借鉴 FrameRonin MapStitch): 格子步进 = PX_PER_CELL * (1 - CELL_OVERLAP),
+// 相邻两格的图片互相压住对方 15%。重叠区内容由 AI 参考图机制保证一致,
+// 显示时后渲染的格子覆盖先渲染的, 接缝自然无缝。设为 0 可回退到紧邻布局。
+export const CELL_OVERLAP = 0.15
+export const CELL_STEP = PX_PER_CELL * (1 - CELL_OVERLAP)
 
 export const DEFAULT_GRID_SIZE = 32
 export const MIN_GRID_SIZE = 1
 export const MAX_GRID_SIZE = 64
 
-export const worldSizeOf = (gridSize) => gridSize * PX_PER_CELL
+// 世界总尺寸: 最后一格原点 + 完整格宽 (重叠布局下小于 gridSize * PX_PER_CELL)
+export const worldSizeOf = (gridSize) => (gridSize - 1) * CELL_STEP + PX_PER_CELL
 
 export const cellId = (x, y) => `L0-${x}-${y}`
 
@@ -21,10 +27,22 @@ export const parseCellId = (id) => {
   return { x, y }
 }
 
-export const cellBoundsLatLng = (x, y) => [
-  [y * PX_PER_CELL, x * PX_PER_CELL],
-  [(y + 1) * PX_PER_CELL, (x + 1) * PX_PER_CELL],
+// 格子图片的渲染范围: 原点按 CELL_STEP 步进, 尺寸仍是完整 PX_PER_CELL → 相邻格重叠 15%
+export const cellImageBoundsLatLng = (x, y) => [
+  [y * CELL_STEP, x * CELL_STEP],
+  [y * CELL_STEP + PX_PER_CELL, x * CELL_STEP + PX_PER_CELL],
 ]
+
+// 格子的"独占区"(不与邻居重叠): 未填充占位格用它渲染, 边框才不会叠出双线;
+// 最末行/列没有下一格来接重叠带, 独占区延伸到完整格宽
+export const cellExclusiveBoundsLatLng = (x, y, gridSize) => {
+  const w = x === gridSize - 1 ? PX_PER_CELL : CELL_STEP
+  const h = y === gridSize - 1 ? PX_PER_CELL : CELL_STEP
+  return [
+    [y * CELL_STEP, x * CELL_STEP],
+    [y * CELL_STEP + h, x * CELL_STEP + w],
+  ]
+}
 
 export const placeholderSvg = (x, y, filled, name) => {
   const bg     = filled ? '#1b1b3a' : '#0c0c1d'

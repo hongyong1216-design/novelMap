@@ -1,0 +1,28 @@
+.cell-prompt-modal__section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.cell-prompt-modal__hint {
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* 棋盘格背景衬出参考图的透明区 (中间待生成部分) */
+.cell-prompt-modal__preview {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: repeating-conic-gradient(#2a2a3e 0% 25%, #1a1a2e 0% 50%) 50% / 16px 16px;
+  text-align: center;
+}
+
+.cell-prompt-modal__preview img {
+  max-width: 100%;
+  max-height: 320px;
+  display: inline-block;
+}

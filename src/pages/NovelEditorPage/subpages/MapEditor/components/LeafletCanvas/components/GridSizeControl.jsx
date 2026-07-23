@@ -1,6 +1,6 @@
 import { Button, Modal, Tooltip } from 'antd'
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
-import { MIN_GRID_SIZE, MAX_GRID_SIZE, PX_PER_CELL, parseCellId, worldSizeOf } from '../utils/grid'
+import { MIN_GRID_SIZE, MAX_GRID_SIZE, PX_PER_CELL, CELL_OVERLAP, parseCellId, worldSizeOf } from '../utils/grid'
 
 // 收集 newSize 之后会被丢弃的已填充格 (x >= newSize 或 y >= newSize)
 function collectAffected(cells, newSize) {
@@ -77,7 +77,9 @@ export default function GridSizeControl({ gridSize, cells, onChange }) {
       </div>
       <div className="grid-size-control__meta">
         世界 {worldPx.toLocaleString()} × {worldPx.toLocaleString()} px
-        <span className="grid-size-control__meta-sub"> (单格 {PX_PER_CELL}px)</span>
+        <span className="grid-size-control__meta-sub">
+          {' '}(单格 {PX_PER_CELL}px · 邻格重叠 {Math.round(CELL_OVERLAP * 100)}%)
+        </span>
       </div>
     </div>
   )

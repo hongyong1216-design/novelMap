@@ -114,6 +114,39 @@
   cursor: pointer;
 }
 
+/* ============================================================
+   重叠区边缘羽化 (移植自 FrameRonin MapStitch 的 Aa 函数)
+   渲染顺序右/下格在上, 每格的左边/上边压住邻居 → 只需羽化这两边。
+   原版曲线 (羽化值 15, 渐变带 5): 距边 0~10% alpha=0 (裁掉自己照抄
+   邻居的部分, 露出下层原版), 10%~15% 线性渐变, 15% 以外完整保留。
+   两个断点与 grid.js 的 CELL_OVERLAP=0.15 联动, 改重叠率需同步调整。
+   ============================================================ */
+.leaflet-canvas {
+  --cell-feather-cut: 10%;  /* 完全透明截止点 = CELL_OVERLAP - 5% 渐变带 */
+  --cell-feather-end: 15%;  /* 渐变结束点 = CELL_OVERLAP */
+}
+
+.cell-feather-l {
+  -webkit-mask-image: linear-gradient(to right, transparent var(--cell-feather-cut), #000 var(--cell-feather-end));
+  mask-image: linear-gradient(to right, transparent var(--cell-feather-cut), #000 var(--cell-feather-end));
+}
+
+.cell-feather-t {
+  -webkit-mask-image: linear-gradient(to bottom, transparent var(--cell-feather-cut), #000 var(--cell-feather-end));
+  mask-image: linear-gradient(to bottom, transparent var(--cell-feather-cut), #000 var(--cell-feather-end));
+}
+
+.cell-feather-lt {
+  -webkit-mask-image:
+    linear-gradient(to right, transparent var(--cell-feather-cut), #000 var(--cell-feather-end)),
+    linear-gradient(to bottom, transparent var(--cell-feather-cut), #000 var(--cell-feather-end));
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent var(--cell-feather-cut), #000 var(--cell-feather-end)),
+    linear-gradient(to bottom, transparent var(--cell-feather-cut), #000 var(--cell-feather-end));
+  mask-composite: intersect;
+}
+
 /* 右上角网格规模控制 */
 .grid-size-control {
   position: absolute;
