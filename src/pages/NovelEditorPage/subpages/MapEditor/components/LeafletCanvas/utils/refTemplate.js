@@ -9,12 +9,15 @@ import { CELL_OVERLAP, cellId } from './grid'
 // 参考图画布边长(px)。与格子虚拟尺寸无关, 按 AI 生图的常用输出分辨率取 2K
 export const REF_TEMPLATE_SIZE = 2048
 
+// 带时间戳绕过浏览器缓存: 工作流是"生成新图后覆盖同名文件", URL 不变时
+// new Image() 会直接命中 memory cache 拿到覆盖前的旧位图 (甚至是带透明的中间稿),
+// 拼出的参考图就会出现残缺/阴影
 const loadImage = (src) =>
   new Promise((resolve, reject) => {
     const img = new Image()
     img.onload = () => resolve(img)
     img.onerror = () => reject(new Error(`图片加载失败: ${src}`))
-    img.src = src
+    img.src = `${src}${src.includes('?') ? '&' : '?'}v=${Date.now()}`
   })
 
 // 收集目标格 (x, y) 周边已有图片的邻居 (8 方向, 含对角)
