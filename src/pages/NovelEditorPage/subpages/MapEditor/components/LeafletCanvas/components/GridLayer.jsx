@@ -26,7 +26,13 @@ function visibleRange(map, gridSize) {
   }
 }
 
-export default function GridLayer({ gridSize, cells, onCellClick, interactive = true }) {
+// 刷新地图时 version 自增: 给图片 URL 挂上 ?v=N 绕过浏览器缓存,
+// 覆盖同名文件 (AI 重新生成的格图) 后无需刷新整页也能看到新内容。
+// react-leaflet 的 ImageOverlay 在 url 变化时会调用 setUrl, 不必重建组件
+const withVersion = (src, version) =>
+  version ? `${src}${src.includes('?') ? '&' : '?'}v=${version}` : src
+
+export default function GridLayer({ gridSize, cells, onCellClick, interactive = true, version = 0 }) {
   const map = useMap()
   // 平移/缩放后强制重算可见范围; 只渲染视口内的格, 网格规模再大也不掉帧
   const [, tick] = useState(0)
@@ -57,7 +63,9 @@ export default function GridLayer({ gridSize, cells, onCellClick, interactive = 
     .sort((a, b) => a.pos.y - b.pos.y || a.pos.x - b.pos.x)
     .forEach(({ id, cell, pos }) => {
       const hasImg = Boolean(cell.src)
-      const url = cell.src || placeholderSvg(pos.x, pos.y, true, cell.name)
+      const url = hasImg
+        ? withVersion(cell.src, version)
+        : placeholderSvg(pos.x, pos.y, true, cell.name)
       const featherL = Boolean(hasImg && cells[cellId(pos.x - 1, pos.y)]?.src)
       const featherT = Boolean(hasImg && cells[cellId(pos.x, pos.y - 1)]?.src)
       const featherClass =

@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { MapContainer, useMap, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import { Modal, message } from 'antd'
 import 'leaflet/dist/leaflet.css'
 import GridLayer from './components/GridLayer'
-import GridSizeControl from './components/GridSizeControl'
+import GridInfoPanel from './components/GridInfoPanel/GridInfoPanel'
 import ClimateBands from './components/ClimateBands'
 import ClimateRuler from './components/ClimateRuler/ClimateRuler'
 import ClimateBandControl from './components/ClimateBandControl/ClimateBandControl'
@@ -18,7 +18,7 @@ import ObjectEditorModal from './components/ObjectEditorModal/ObjectEditorModal'
 import CellPromptModal from './components/CellPromptModal/CellPromptModal'
 import useWorldData from './hooks/useWorldData'
 import { demoWorld } from './data/demoWorld'
-import { DEFAULT_GRID_SIZE, parseCellId, worldSizeOf } from './utils/grid'
+import { DEFAULT_GRID_SIZE, worldSizeOf } from './utils/grid'
 import './LeafletCanvas.css'
 
 // 反转 Simple CRS 的 y 方向: 让 lat=0 在屏幕顶部, lat 越大越往下 (跟屏幕坐标一致)
@@ -66,14 +66,14 @@ function MapReady({ onReady }) {
 }
 
 export default function LeafletCanvas() {
-  const [gridSize, setGridSize] = useState(DEFAULT_GRID_SIZE)
-  const [cells, setCells] = useState(demoWorld.cells)
   const [zoom, setZoom] = useState(-4)
   const [editMode, setEditMode] = useState('idle')
   const [editorState, setEditorState] = useState(null)
   const [climateVisible, setClimateVisible] = useState(true)
   const [climateOpacity, setClimateOpacity] = useState(0.85)
   const [mapInstance, setMapInstance] = useState(null)
+  // 每次点"刷新地图"自增, 传给 GridLayer 给图片 URL 换版本号 → 重新拉取 public/maps 下的文件
+  const [mapVersion, setMapVersion] = useState(0)
   // 点击格子弹出的 AI 生图助手 (提示词 + 邻居重叠参考图)
   const [promptCell, setPromptCell] = useState(null)
   const fileInputRef = useRef(null)
@@ -89,28 +89,15 @@ export default function LeafletCanvas() {
     replaceAll,
   } = useWorldData()
 
-  const worldSize = useMemo(() => worldSizeOf(gridSize), [gridSize])
-  const initialCenter = useMemo(
-    () => [worldSizeOf(DEFAULT_GRID_SIZE) / 2, worldSizeOf(DEFAULT_GRID_SIZE) / 2],
-    []
-  )
+  // 网格规格固定 (右上角面板只做展示), cells 直接取静态映射
+  const gridSize = DEFAULT_GRID_SIZE
+  const cells = demoWorld.cells
+  const worldSize = worldSizeOf(gridSize)
+  const initialCenter = [worldSize / 2, worldSize / 2]
 
-  const handleGridSizeChange = (nextSize) => {
-    setGridSize(nextSize)
-    setCells((prev) => {
-      const next = {}
-      let pruned = false
-      Object.entries(prev).forEach(([id, cell]) => {
-        const pos = parseCellId(id)
-        if (!pos) {
-          next[id] = cell
-          return
-        }
-        if (pos.x < nextSize && pos.y < nextSize) next[id] = cell
-        else pruned = true
-      })
-      return pruned ? next : prev
-    })
+  const handleRefreshMap = () => {
+    setMapVersion((v) => v + 1)
+    message.success('地图已刷新')
   }
 
   const handleMapClick = (e) => {
@@ -268,6 +255,7 @@ export default function LeafletCanvas() {
           cells={cells}
           interactive={!isAdding}
           onCellClick={handleCellClick}
+          version={mapVersion}
         />
 
         <ClimateBands worldSize={worldSize} visible={climateVisible} opacity={climateOpacity} />
@@ -306,11 +294,7 @@ export default function LeafletCanvas() {
         onChange={handleFileSelected}
         style={{ display: 'none' }}
       />
-      <GridSizeControl
-        gridSize={gridSize}
-        cells={cells}
-        onChange={handleGridSizeChange}
-      />
+      <GridInfoPanel gridSize={gridSize} onRefresh={handleRefreshMap} />
       <ZoomHUD zoom={zoom} />
 
       <ClimateBandControl

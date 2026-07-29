@@ -17,18 +17,17 @@
 
 | 项 | 值 |
 |------|------|
-| 默认格数 | 32 × 32 |
-| 最小格数 | 1 × 1 |
-| 最大格数 | 64 × 64 |
+| 格数 | 32 × 32 (`DEFAULT_GRID_SIZE`,固定) |
 | 单格像素 | 4096 (`PX_PER_CELL`) |
 | 邻格重叠 | 15% (`CELL_OVERLAP`),步进 3481.6 (`CELL_STEP`) |
 | 世界尺寸 | `(格数-1) × 3481.6 + 4096` |
 | zoom 区间 | `[-4, 5]` |
 
-格数可在地图右上角"网格规模"浮层调整:
+地图右上角浮层只读展示以上规格,并提供**刷新地图**按钮:
+点一下会给所有格子图片 URL 换一个版本号 (`?v=N`) 重新拉取,
+覆盖了 `public/maps/` 下的同名文件后不用刷新整页就能看到新图。
 
-- **增加**: 世界向右下扩展,已有格保留。
-- **减少**: 若有"超出范围"的已填充格,会弹 Modal 确认后再删除;无影响则直接缩小。
+改格数请直接改 `utils/grid.js` 的 `DEFAULT_GRID_SIZE`。
 
 ---
 
@@ -121,7 +120,7 @@ const IMAGES = {
 
 - Leaflet `L.CRS.Simple` 下 `LatLng` 顺序为 `[lat, lng]`,等价于 `[y, x]` —— marker/region/label 的 `coord` 字段是 `[y, x]`,不是 `[x, y]`。
 - `regions.polygon` / `routes.line` 同样是 `[y, x]` 数组。
-- 调整格数只影响"网格 + cells",已有 marker/region/route/label 的世界坐标不受影响;如果某对象坐标超出新世界,它仍然存在但落在不可达区域。
+- 改 `DEFAULT_GRID_SIZE` 只影响"网格 + cells",已有 marker/region/route/label 的世界坐标不受影响;如果某对象坐标超出新世界,它仍然存在但落在不可达区域。
 
 ---
 
