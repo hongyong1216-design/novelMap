@@ -6,5 +6,5 @@ export const DEFAULT_PROMPT = `你是一位专精俯视角幻想世界地图的�
 export const composePrompt = (basePrompt, extraPrompt) => {
   const base = basePrompt.trim() || DEFAULT_PROMPT
   const extra = extraPrompt.trim()
-  return extra ? `${base}\n\n补充要求：${extra}` : base
+  return extra ? `${base}\n\n补充要求：画面待补充的部分是${extra}` : base
 }
