@@ -420,6 +420,18 @@ Object.assign(IMAGES, {
   'L0-6-26': '/maps/L0-6-26.jpeg',
   'L0-6-25': '/maps/L0-6-25.jpeg',
   'L0-7-22': '/maps/L0-7-22.jpeg',
+  'L0-6-24': '/maps/L0-6-24.jpeg',
+  'L0-7-21': '/maps/L0-7-21.jpeg',
+  'L0-6-23': '/maps/L0-6-23.jpeg',
+  'L0-6-22': '/maps/L0-6-22.jpeg',
+  'L0-8-13': '/maps/L0-8-13.jpeg',
+  'L0-8-14': '/maps/L0-8-14.jpeg',
+  'L0-8-12': '/maps/L0-8-12.jpeg',
+  'L0-7-13': '/maps/L0-7-13.jpeg',
+  'L0-7-14': '/maps/L0-7-14.jpeg',
+  'L0-7-12': '/maps/L0-7-12.jpeg',
+  'L0-6-14': '/maps/L0-6-14.jpeg',
+  'L0-6-13': '/maps/L0-6-13.jpeg',
 })
 Object.assign(ZT_NAMES, {
   'L0-15-12': '岳主峰', 'L0-18-15': '翳垆雾台', 'L0-12-15': '世树', 'L0-15-18': '元渊·渊心',
