@@ -464,6 +464,7 @@ Object.assign(IMAGES, {
   'L0-2-15': '/maps/L0-2-15.jpeg',
   'L0-1-15': '/maps/L0-1-15.jpeg',
   'L0-5-11': '/maps/L0-5-11.jpeg',
+  'L0-4-11': '/maps/L0-4-11.jpeg',
 })
 Object.assign(ZT_NAMES, {
   'L0-15-12': '岳主峰', 'L0-18-15': '翳垆雾台', 'L0-12-15': '世树', 'L0-15-18': '元渊·渊心',
