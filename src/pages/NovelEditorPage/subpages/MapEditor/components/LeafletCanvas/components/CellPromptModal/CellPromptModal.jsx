@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Modal, Input, Button, Space, Tag, Typography, message } from 'antd'
+import { Modal, Input, Button, Space, Tag, Tooltip, Typography, message } from 'antd'
 import { CopyOutlined, PictureOutlined, DownloadOutlined } from '@ant-design/icons'
 import { parseCellId } from '../../utils/grid'
 import { buildRefTemplate, filledNeighborsOf, downloadBlob } from '../../utils/refTemplate'
@@ -73,11 +73,27 @@ export default function CellPromptModal({ open, cellId, cell, cells, onClose }) 
     if (preview) downloadBlob(preview.blob, `ref_${cellId}.png`)
   }
 
+  // 点标题即复制一行 IMAGES 条目, 直接粘到 demoWorld.js 的 IMAGES 字典里
+  const imageEntry = `'${cellId}': '${cell?.src || `/maps/${cellId}.jpeg`}',`
+
+  const handleCopyEntry = async () => {
+    try {
+      await navigator.clipboard.writeText(imageEntry)
+      message.success(`已复制 ${imageEntry}`)
+    } catch {
+      message.error('复制失败, 请手动选择文本复制')
+    }
+  }
+
   return (
     <Modal
       title={
         <Space size={8}>
-          <span>{cell?.name || cellId}</span>
+          <Tooltip title={`点击复制: ${imageEntry}`}>
+            <span className="cell-prompt-modal__entry" onClick={handleCopyEntry}>
+              {cell?.name || cellId}
+            </span>
+          </Tooltip>
           <Tag>{cellId}</Tag>
           <Tag color={cell?.src ? 'purple' : 'default'}>{cell?.src ? '已有图片' : '未探索'}</Tag>
         </Space>

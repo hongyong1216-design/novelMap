@@ -1,3 +1,21 @@
+/* 标题名可点击复制 IMAGES 条目 */
+.cell-prompt-modal__entry {
+  cursor: pointer;
+  padding: 1px 6px;
+  margin-left: -6px;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.cell-prompt-modal__entry:hover {
+  color: var(--accent-light, #a29bfe);
+  background: rgba(108, 92, 231, 0.18);
+}
+
+.cell-prompt-modal__entry:active {
+  background: rgba(108, 92, 231, 0.32);
+}
+
 .cell-prompt-modal__section {
   display: flex;
   flex-direction: column;
