@@ -5,6 +5,7 @@ import {
   ImportOutlined,
   ExportOutlined,
   TagOutlined,
+  CloudDownloadOutlined,
 } from '@ant-design/icons'
 import './EditToolbar.css'
 
@@ -18,6 +19,8 @@ export default function EditToolbar({
   onModeChange,
   onImport,
   onExport,
+  onSync,
+  syncing = false,
 }) {
   const toggle = (mode) => onModeChange(editMode === mode ? 'idle' : mode)
 
@@ -47,6 +50,16 @@ export default function EditToolbar({
       </div>
 
       <div className="edit-toolbar__row edit-toolbar__row--small">
+        <Tooltip title="把下载夹里新生成的地图图片搬进 public/maps 并登记到 demoWorld.js">
+          <Button
+            size="small"
+            icon={<CloudDownloadOutlined />}
+            loading={syncing}
+            onClick={onSync}
+          >
+            同步
+          </Button>
+        </Tooltip>
         <Tooltip title="导入 JSON">
           <Button
             size="small"

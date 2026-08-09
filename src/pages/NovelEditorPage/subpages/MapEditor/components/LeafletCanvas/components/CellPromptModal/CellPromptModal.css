@@ -1,4 +1,4 @@
-/* 标题名可点击复制 IMAGES 条目 */
+/* 标题名可点击, 把 IMAGES 条目写进 demoWorld.js */
 .cell-prompt-modal__entry {
   cursor: pointer;
   padding: 1px 6px;
@@ -14,6 +14,13 @@
 
 .cell-prompt-modal__entry:active {
   background: rgba(108, 92, 231, 0.32);
+}
+
+/* 写入中: 禁止重复点击 */
+.cell-prompt-modal__entry.is-busy {
+  cursor: wait;
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .cell-prompt-modal__section {

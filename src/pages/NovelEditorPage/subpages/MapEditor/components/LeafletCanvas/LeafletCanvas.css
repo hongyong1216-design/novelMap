@@ -148,3 +148,35 @@
 }
 
 /* 右上角网格规格面板样式见 components/GridInfoPanel/GridInfoPanel.css */
+
+/* ============================================================
+   "同步下载夹"结果弹窗 (Modal 挂在 body 下, 故不嵌在 .leaflet-canvas 里)
+   ============================================================ */
+.map-sync-result ul {
+  margin: 0 0 10px;
+  padding-left: 18px;
+  max-height: 240px;
+  overflow: auto;
+}
+
+.map-sync-result li {
+  margin-bottom: 4px;
+  font-size: 13px;
+  line-height: 1.6;
+  word-break: break-all;
+}
+
+.map-sync-result__tail {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.55));
+}
+
+.map-sync-result__tail p {
+  margin: 0 0 2px;
+}
+
+.map-sync-result__dir {
+  word-break: break-all;
+  opacity: 0.7;
+}

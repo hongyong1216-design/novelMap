@@ -65,6 +65,13 @@ function MapReady({ onReady }) {
   return null
 }
 
+// 同步下载夹时, 一格可能缺文件也可能缺登记, 分开说清楚
+const SYNC_ACTION_TEXT = {
+  synced: '新增',
+  copied: '补图片',
+  registered: '补登记',
+}
+
 export default function LeafletCanvas() {
   const [zoom, setZoom] = useState(-4)
   const [editMode, setEditMode] = useState('idle')
@@ -74,6 +81,7 @@ export default function LeafletCanvas() {
   const [mapInstance, setMapInstance] = useState(null)
   // 每次点"刷新地图"自增, 传给 GridLayer 给图片 URL 换版本号 → 重新拉取 public/maps 下的文件
   const [mapVersion, setMapVersion] = useState(0)
+  const [syncing, setSyncing] = useState(false)
   // 点击格子弹出的 AI 生图助手 (提示词 + 邻居重叠参考图)
   const [promptCell, setPromptCell] = useState(null)
   const fileInputRef = useRef(null)
@@ -98,6 +106,57 @@ export default function LeafletCanvas() {
   const handleRefreshMap = () => {
     setMapVersion((v) => v + 1)
     message.success('地图已刷新')
+  }
+
+  // 把下载夹里新出的成图搬进 public/maps 并登记, 每格只取最新一份, 已同步过的跳过
+  const handleSync = async () => {
+    if (syncing) return
+    setSyncing(true)
+    try {
+      const res = await fetch('/__api/sync-downloads', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`)
+
+      const done = data.results.filter((r) => r.action !== 'skipped')
+      const skipped = data.results.filter((r) => r.action === 'skipped')
+      const tail = (
+        <div className="map-sync-result__tail">
+          {skipped.length > 0 && <p>已同步过, 跳过 {skipped.length} 格: {skipped.map((r) => r.cellId).join(', ')}</p>}
+          {data.refSkipped > 0 && <p>另跳过 {data.refSkipped} 个参考图 (中间为透明待补区, 不能当成图)</p>}
+          <p className="map-sync-result__dir">来源: {data.dir}</p>
+        </div>
+      )
+
+      if (done.length === 0) {
+        Modal.info({ title: '没有需要同步的图片', content: tail, okText: '知道了' })
+        return
+      }
+
+      setMapVersion((v) => v + 1)
+      Modal.success({
+        title: `已同步 ${done.length} 格`,
+        content: (
+          <div className="map-sync-result">
+            <ul>
+              {done.map((r) => (
+                <li key={r.cellId}>
+                  <b>{r.cellId}</b> ({SYNC_ACTION_TEXT[r.action]}) ← {r.from}
+                </li>
+              ))}
+            </ul>
+            {tail}
+          </div>
+        ),
+        okText: '完成',
+      })
+    } catch (err) {
+      Modal.error({
+        title: '同步失败',
+        content: `${String(err?.message || err)} (该功能依赖 dev server, 需用 npm run dev 启动)`,
+      })
+    } finally {
+      setSyncing(false)
+    }
   }
 
   const handleMapClick = (e) => {
@@ -286,6 +345,8 @@ export default function LeafletCanvas() {
         onModeChange={setEditMode}
         onImport={handleImport}
         onExport={handleExport}
+        onSync={handleSync}
+        syncing={syncing}
       />
       <input
         ref={fileInputRef}

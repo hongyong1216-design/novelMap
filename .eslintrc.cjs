@@ -11,6 +11,13 @@ module.exports = {
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
   settings: { react: { version: '18.2' } },
   plugins: ['react-refresh'],
+  // 构建期 / 命令行脚本跑在 Node 里, 不是浏览器
+  overrides: [
+    {
+      files: ['vite.config.js', 'plugins/**/*.js', 'scripts/**/*.{js,mjs}'],
+      env: { node: true, browser: false },
+    },
+  ],
   rules: {
     'react/jsx-no-target-blank': 'off',
     'react-refresh/only-export-components': [

@@ -14,6 +14,7 @@ export default function CellPromptModal({ open, cellId, cell, cells, onClose }) 
   const [basePrompt, setBasePrompt] = useState(DEFAULT_PROMPT)
   const [extraPrompt, setExtraPrompt] = useState('')
   const [building, setBuilding] = useState(false)
+  const [registering, setRegistering] = useState(false)
   const [preview, setPreview] = useState(null) // { url, blob, neighborCount }
   const previewUrlRef = useRef(null)
 
@@ -70,18 +71,43 @@ export default function CellPromptModal({ open, cellId, cell, cells, onClose }) 
   }
 
   const handleDownload = () => {
-    if (preview) downloadBlob(preview.blob, `ref_${cellId}.png`)
+    if (preview) downloadBlob(preview.blob, `${cellId}.png`)
   }
 
-  // 点标题即复制一行 IMAGES 条目, 直接粘到 demoWorld.js 的 IMAGES 字典里
-  const imageEntry = `'${cellId}': '${cell?.src || `/maps/${cellId}.jpeg`}',`
+  // 点标题即把这一格的 IMAGES 条目写进 demoWorld.js (浏览器写不了文件, 由 dev server 代劳)
+  const imageSrc = cell?.src || `/maps/${cellId}.jpeg`
+  const imageEntry = `'${cellId}': '${imageSrc}',`
 
-  const handleCopyEntry = async () => {
+  const handleRegisterEntry = async () => {
+    if (registering) return
+    setRegistering(true)
     try {
-      await navigator.clipboard.writeText(imageEntry)
-      message.success(`已复制 ${imageEntry}`)
-    } catch {
-      message.error('复制失败, 请手动选择文本复制')
+      const res = await fetch('/__api/register-cell-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cellId, src: imageSrc }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`)
+
+      if (data.status === 'already') {
+        message.info(`${cellId} 已经注册过了`)
+      } else if (data.fileExists) {
+        message.success(`已写入 demoWorld.js: ${imageEntry}`)
+      } else {
+        message.warning(`条目已写入, 但 public${imageSrc} 还不存在, 记得把图片放进去`)
+      }
+    } catch (err) {
+      // dev server 不可用 (如生产预览) 时退回老办法: 复制条目手动粘贴
+      const reason = String(err?.message || err)
+      try {
+        await navigator.clipboard.writeText(imageEntry)
+        message.warning(`写入失败 (${reason}), 已复制条目到剪贴板`)
+      } catch {
+        message.error(`写入失败: ${reason}`)
+      }
+    } finally {
+      setRegistering(false)
     }
   }
 
@@ -89,8 +115,11 @@ export default function CellPromptModal({ open, cellId, cell, cells, onClose }) 
     <Modal
       title={
         <Space size={8}>
-          <Tooltip title={`点击复制: ${imageEntry}`}>
-            <span className="cell-prompt-modal__entry" onClick={handleCopyEntry}>
+          <Tooltip title={`点击写入 demoWorld.js: ${imageEntry}`}>
+            <span
+              className={`cell-prompt-modal__entry${registering ? ' is-busy' : ''}`}
+              onClick={handleRegisterEntry}
+            >
               {cell?.name || cellId}
             </span>
           </Tooltip>
