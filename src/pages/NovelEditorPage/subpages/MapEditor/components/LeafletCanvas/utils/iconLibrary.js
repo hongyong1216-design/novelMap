@@ -1,10 +1,13 @@
 // 标记图标库: 按分组组织
 // 每个 item:
-//   { id, kind: 'dot' | 'emoji', label, group }
+//   { id, kind: 'dot' | 'emoji' | 'image', label, group }
 //   dot:   color (CSS 颜色)
 //   emoji: char (单个或多个 unicode 字符)
+//   image: src  (图片路径, '' 表示待补图 → 渲染占位框); 定义在 data/mapIcons.js
+import { MAP_ICON_CATEGORIES } from '../data/mapIcons'
 
-export const ICON_GROUPS = [
+// emoji / 色点分组 (轻量, 表单里快速选)
+const BUILTIN_GROUPS = [
   {
     group: '色点',
     items: [
@@ -84,6 +87,22 @@ export const ICON_GROUPS = [
       { id: 'pin',     kind: 'emoji', char: '📍', label: '标记点' },
     ],
   },
+]
+
+// 图片图标分组: 由 data/mapIcons.js 派生, 与工具栏图标栏共用同一份数据,
+// 合并进 ICON_GROUPS 后, 编辑已有标记时也能在表单里看到并切换图片图标。
+// 显示名带 "· 图片" 后缀, 与内置的同名 emoji 分组 (如「建筑」) 区分开
+const IMAGE_GROUPS = MAP_ICON_CATEGORIES.map((c) => ({
+  id: `img-${c.id}`,
+  group: `${c.name} · 图片`,
+  items: c.icons.map((it) => ({ ...it, kind: 'image' })),
+}))
+
+// 分组名可能重复(内置「建筑」vs 图片「建筑」), 故另给每组唯一 id 供 React key 使用。
+// 图片组排在前面: 它是地图上的正式地标图标, 且从图标栏点选后弹出的表单要能一眼看到选中态
+export const ICON_GROUPS = [
+  ...IMAGE_GROUPS,
+  ...BUILTIN_GROUPS.map((g) => ({ ...g, id: `emoji-${g.group}` })),
 ]
 
 // 扁平索引: id → item

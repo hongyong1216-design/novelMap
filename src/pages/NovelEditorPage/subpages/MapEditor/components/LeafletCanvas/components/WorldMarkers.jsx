@@ -16,7 +16,16 @@ const buildIcon = (m) => {
   const name = escapeHtml(m.name)
   let inner
   let anchorY
-  if (visual.kind === 'emoji') {
+  // 图片图标比 emoji / 色点占地大, 点击热区(iconSize)要跟着放大才盖得住图 + 名称
+  let iconSize = [120, 48]
+  if (visual.kind === 'image') {
+    // 图片未补充时先渲染占位框, 地标不至于凭空消失
+    inner = visual.src
+      ? `<img class="novelmap-marker__image" src="${escapeHtml(visual.src)}" alt="${escapeHtml(visual.label || '')}" draggable="false" />`
+      : `<div class="novelmap-marker__image novelmap-marker__image--pending">${escapeHtml(visual.label?.[0] || '?')}</div>`
+    anchorY = 24 // 图高 48px 的一半 → 图心对准坐标点
+    iconSize = [120, 76]
+  } else if (visual.kind === 'emoji') {
     inner = `<div class="novelmap-marker__emoji">${visual.char}</div>`
     anchorY = 14
   } else {
@@ -27,7 +36,7 @@ const buildIcon = (m) => {
   return L.divIcon({
     className: 'novelmap-marker',
     html: `${inner}<div class="novelmap-marker__label">${name}</div>`,
-    iconSize: [120, 48],
+    iconSize,
     iconAnchor: [60, anchorY],
   })
 }

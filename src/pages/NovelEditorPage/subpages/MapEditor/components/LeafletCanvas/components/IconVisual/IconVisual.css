@@ -1,0 +1,30 @@
+.icon-visual__dot {
+  display: block;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+}
+
+.icon-visual__emoji {
+  line-height: 1;
+}
+
+.icon-visual__img {
+  display: block;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* 待补图占位: 虚线框 + 名称首字 */
+.icon-visual__pending {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(162, 155, 254, 0.45);
+  border-radius: 4px;
+  background: rgba(108, 92, 231, 0.08);
+  color: rgba(162, 155, 254, 0.75);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+}

@@ -1,0 +1,73 @@
+.icon-panel {
+  margin: 8px 0;
+  padding: 10px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  width: 288px;
+}
+
+.icon-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  max-height: 268px;
+  overflow-y: auto;
+  margin-top: 10px;
+  padding: 2px 4px 2px 0;
+}
+
+.icon-panel__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 2px 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: grab;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  color: inherit;
+}
+
+.icon-panel__item:hover {
+  background: rgba(108, 92, 231, 0.18);
+  border-color: rgba(108, 92, 231, 0.5);
+}
+
+.icon-panel__item:active {
+  cursor: grabbing;
+}
+
+.icon-panel__item--selected {
+  background: rgba(108, 92, 231, 0.32);
+  border-color: #6c5ce7;
+  box-shadow: 0 0 0 1px rgba(108, 92, 231, 0.4) inset;
+}
+
+.icon-panel__thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  pointer-events: none; /* 让拖拽事件始终落在按钮上 */
+}
+
+.icon-panel__name {
+  font-size: 11px;
+  line-height: 1;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  pointer-events: none;
+}
+
+.icon-panel__hint {
+  margin-top: 8px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.45));
+}

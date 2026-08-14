@@ -1,11 +1,13 @@
 import { ICON_GROUPS } from '../../utils/iconLibrary'
+import IconVisual from '../IconVisual/IconVisual'
+import '../IconVisual/IconVisual.css'
 import './IconPicker.css'
 
 export default function IconPicker({ value, onChange }) {
   return (
     <div className="icon-picker">
       {ICON_GROUPS.map((g) => (
-        <div key={g.group} className="icon-picker__group">
+        <div key={g.id} className="icon-picker__group">
           <div className="icon-picker__group-label">{g.group}</div>
           <div className="icon-picker__grid">
             {g.items.map((it) => (
@@ -19,14 +21,7 @@ export default function IconPicker({ value, onChange }) {
                 }
                 onClick={() => onChange(it.id)}
               >
-                {it.kind === 'dot' ? (
-                  <span
-                    className="icon-picker__dot"
-                    style={{ background: it.color }}
-                  />
-                ) : (
-                  <span className="icon-picker__emoji">{it.char}</span>
-                )}
+                <IconVisual icon={it} size={28} />
               </button>
             ))}
           </div>

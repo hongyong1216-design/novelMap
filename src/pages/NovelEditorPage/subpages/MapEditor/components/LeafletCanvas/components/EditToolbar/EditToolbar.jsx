@@ -6,17 +6,24 @@ import {
   ExportOutlined,
   TagOutlined,
   CloudDownloadOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons'
+import IconPanel from '../IconPanel/IconPanel'
 import './EditToolbar.css'
 
 const MODE_HINT = {
   'adding-label': '点击地图任意位置添加标签',
   'adding-marker': '点击地图任意位置添加标记',
+  'adding-icon': '点击地图任意位置放置图标',
 }
 
 export default function EditToolbar({
   editMode = 'idle',
   onModeChange,
+  iconPanelOpen = false,
+  onToggleIconPanel,
+  selectedIconId,
+  onSelectIcon,
   onImport,
   onExport,
   onSync,
@@ -25,7 +32,7 @@ export default function EditToolbar({
   const toggle = (mode) => onModeChange(editMode === mode ? 'idle' : mode)
 
   return (
-    <div className="edit-toolbar">
+    <div className={`edit-toolbar${iconPanelOpen ? ' edit-toolbar--expanded' : ''}`}>
       <div className="edit-toolbar__label">地图编辑</div>
 
       <div className="edit-toolbar__row">
@@ -47,7 +54,20 @@ export default function EditToolbar({
             标记
           </Button>
         </Tooltip>
+        <Tooltip title="展开图标栏, 把图片图标拖到地图上">
+          <Button
+            type={iconPanelOpen ? 'primary' : 'default'}
+            icon={<AppstoreOutlined />}
+            onClick={onToggleIconPanel}
+          >
+            图标
+          </Button>
+        </Tooltip>
       </div>
+
+      {iconPanelOpen && (
+        <IconPanel selectedId={selectedIconId} onSelect={onSelectIcon} />
+      )}
 
       <div className="edit-toolbar__row edit-toolbar__row--small">
         <Tooltip title="把下载夹里新生成的地图图片搬进 public/maps 并登记到 demoWorld.js">

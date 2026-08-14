@@ -62,6 +62,17 @@ export const rangeOfPreset = (id) => {
   return p ? p.range : [MIN_ZOOM, MAX_ZOOM]
 }
 
+// 当前 zoom → 推荐的 { minZoom, maxZoom } 字段对
+// 供"不走表单直接落点"的场景 (如拖拽放置图标) 取到与表单一致的默认可见性;
+// ±Infinity 的那一边不写字段, 语义等同无限制
+export const defaultZoomRangeFor = (zoom) => {
+  const [min, max] = rangeOfPreset(recommendPresetForZoom(zoom))
+  const result = {}
+  if (Number.isFinite(min)) result.minZoom = min
+  if (Number.isFinite(max)) result.maxZoom = max
+  return result
+}
+
 // 统一可见性判断: 对象数据 + 当前 zoom → 是否应显示
 export const isVisibleAtZoom = (obj, zoom) => {
   const min = obj.minZoom ?? -Infinity

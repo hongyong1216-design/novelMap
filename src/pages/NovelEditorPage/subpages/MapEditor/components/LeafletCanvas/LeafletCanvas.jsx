@@ -16,8 +16,11 @@ import ZoomHUD from './components/ZoomHUD/ZoomHUD'
 import EditToolbar from './components/EditToolbar/EditToolbar'
 import ObjectEditorModal from './components/ObjectEditorModal/ObjectEditorModal'
 import CellPromptModal from './components/CellPromptModal/CellPromptModal'
+import { ICON_DND_TYPE } from './components/IconPanel/IconPanel'
 import useWorldData from './hooks/useWorldData'
 import { demoWorld } from './data/demoWorld'
+import { MAP_ICON_INDEX } from './data/mapIcons'
+import { defaultZoomRangeFor } from './utils/visibilityPresets'
 import { DEFAULT_GRID_SIZE, worldSizeOf } from './utils/grid'
 import './LeafletCanvas.css'
 
@@ -84,6 +87,11 @@ export default function LeafletCanvas() {
   const [syncing, setSyncing] = useState(false)
   // 点击格子弹出的 AI 生图助手 (提示词 + 邻居重叠参考图)
   const [promptCell, setPromptCell] = useState(null)
+  // 图标栏展开状态 + 当前选中的图标 (选中后点地图落点; 拖拽落点则不依赖选中)
+  const [iconPanelOpen, setIconPanelOpen] = useState(false)
+  const [pendingIconId, setPendingIconId] = useState(null)
+  // 图标正拖到地图上方, 用于给画布加高亮提示
+  const [iconDragOver, setIconDragOver] = useState(false)
   const fileInputRef = useRef(null)
   const {
     novelId,
@@ -159,6 +167,61 @@ export default function LeafletCanvas() {
     }
   }
 
+  // 离开图标放置模式时把待落点图标一并清掉, 免得下次误用上次的选择
+  const handleModeChange = (mode) => {
+    setEditMode(mode)
+    if (mode !== 'adding-icon') setPendingIconId(null)
+  }
+
+  // 工具栏「图标」按钮: 展开/收起图标栏, 收起时顺带退出放置模式
+  const handleToggleIconPanel = () => {
+    if (iconPanelOpen) {
+      setIconPanelOpen(false)
+      handleModeChange('idle')
+    } else {
+      setIconPanelOpen(true)
+    }
+  }
+
+  // 图标栏里点选: 选中即进入放置模式, 再点一次取消选中
+  const handleSelectIcon = (iconId) => {
+    setPendingIconId(iconId)
+    setEditMode(iconId ? 'adding-icon' : 'idle')
+  }
+
+  // ---- 从图标栏拖到地图上落点 ----
+  const handleIconDragOver = (e) => {
+    if (!e.dataTransfer.types.includes(ICON_DND_TYPE)) return
+    e.preventDefault() // 不阻止默认行为就不会触发 drop
+    e.dataTransfer.dropEffect = 'copy'
+    if (!iconDragOver) setIconDragOver(true)
+  }
+
+  // dragleave 在子元素间移动也会触发, 用 relatedTarget 判断是否真的离开了画布
+  const handleIconDragLeave = (e) => {
+    if (e.currentTarget.contains(e.relatedTarget)) return
+    setIconDragOver(false)
+  }
+
+  // 拖放是"快速落点": 直接用图标名建标记, 不打断为弹表单; 之后点标记可再改名/调可见性
+  const handleIconDrop = (e) => {
+    const iconId = e.dataTransfer.getData(ICON_DND_TYPE)
+    setIconDragOver(false)
+    if (!iconId || !mapInstance) return
+    e.preventDefault()
+    const latlng = mapInstance.mouseEventToLatLng(e.nativeEvent)
+    const icon = MAP_ICON_INDEX[iconId]
+    // 拖到世界边缘外时收回边界内, 避免落到 maxBounds 之外看不见
+    const clamp = (v) => Math.max(0, Math.min(worldSize, v))
+    addMarker({
+      name: icon?.label || '新地标',
+      iconId,
+      coord: [clamp(latlng.lat), clamp(latlng.lng)],
+      ...defaultZoomRangeFor(zoom),
+    })
+    message.success(`已放置「${icon?.label || '图标'}」, 点击可编辑`)
+  }
+
   const handleMapClick = (e) => {
     if (editMode === 'idle') return
     const coord = [e.latlng.lat, e.latlng.lng]
@@ -167,7 +230,8 @@ export default function LeafletCanvas() {
       objectType,
       mode: 'create',
       coord,
-      initialValues: null,
+      // 图标模式下把选中的图标带进表单, 用户只需补个名称
+      initialValues: editMode === 'adding-icon' ? { iconId: pendingIconId } : null,
       targetId: null,
     })
   }
@@ -203,7 +267,7 @@ export default function LeafletCanvas() {
       const payload = { ...values, coord }
       if (objectType === 'marker') addMarker(payload)
       else addLabel(payload)
-      setEditMode('idle')
+      handleModeChange('idle')
     } else {
       if (objectType === 'marker') updateMarker(targetId, values)
       else updateLabel(targetId, values)
@@ -290,7 +354,16 @@ export default function LeafletCanvas() {
   const isAdding = editMode !== 'idle'
 
   return (
-    <div className={`leaflet-canvas-wrap${isAdding ? ' editing' : ''}`}>
+    <div
+      className={
+        'leaflet-canvas-wrap' +
+        (isAdding ? ' editing' : '') +
+        (iconDragOver ? ' icon-dropping' : '')
+      }
+      onDragOver={handleIconDragOver}
+      onDragLeave={handleIconDragLeave}
+      onDrop={handleIconDrop}
+    >
       <MapContainer
         crs={TopDownSimpleCRS}
         center={initialCenter}
@@ -342,7 +415,11 @@ export default function LeafletCanvas() {
 
       <EditToolbar
         editMode={editMode}
-        onModeChange={setEditMode}
+        onModeChange={handleModeChange}
+        iconPanelOpen={iconPanelOpen}
+        onToggleIconPanel={handleToggleIconPanel}
+        selectedIconId={pendingIconId}
+        onSelectIcon={handleSelectIcon}
         onImport={handleImport}
         onExport={handleExport}
         onSync={handleSync}

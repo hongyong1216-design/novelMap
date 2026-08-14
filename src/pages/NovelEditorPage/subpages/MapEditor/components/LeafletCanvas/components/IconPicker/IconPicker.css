@@ -23,7 +23,7 @@
 
 .icon-picker__grid {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 4px;
 }
 
@@ -51,16 +51,4 @@
   background: rgba(108, 92, 231, 0.32);
   border-color: #6c5ce7;
   box-shadow: 0 0 0 1px rgba(108, 92, 231, 0.4) inset;
-}
-
-.icon-picker__dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.55);
-}
-
-.icon-picker__emoji {
-  font-size: 18px;
-  line-height: 1;
 }
