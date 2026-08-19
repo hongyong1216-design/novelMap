@@ -1,0 +1,45 @@
+.edge-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  /* 整层不吃事件，只有下面显式打开的线条能点 */
+  pointer-events: none;
+}
+
+.edge-layer__line {
+  fill: none;
+  stroke: #005aff;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 6px rgba(0, 90, 255, 0.5));
+}
+
+/* 加宽的透明描边，扩大点击热区 */
+.edge-layer__hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 14;
+}
+
+/* 真正接收点击的那层，hover 时变红提示可删除 */
+.edge-layer__hover {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 14;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.edge-layer__edge:hover .edge-layer__line {
+  stroke: #ff7a92;
+  stroke-width: 3;
+  filter: drop-shadow(0 0 8px rgba(255, 122, 146, 0.6));
+}
+
+.edge-layer__pending {
+  fill: none;
+  stroke: #00f2ff;
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+  opacity: 0.85;
+}

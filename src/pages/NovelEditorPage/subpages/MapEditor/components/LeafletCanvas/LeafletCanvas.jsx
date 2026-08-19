@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { MapContainer, useMap, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import { Modal, message } from 'antd'
@@ -16,20 +16,16 @@ import ZoomHUD from './components/ZoomHUD/ZoomHUD'
 import EditToolbar from './components/EditToolbar/EditToolbar'
 import ObjectEditorModal from './components/ObjectEditorModal/ObjectEditorModal'
 import CellPromptModal from './components/CellPromptModal/CellPromptModal'
+import SubMapWindow from './components/SubMapWindow/SubMapWindow'
 import { ICON_DND_TYPE } from './components/IconPanel/IconPanel'
 import useWorldData from './hooks/useWorldData'
 import { demoWorld } from './data/demoWorld'
 import { MAP_ICON_INDEX } from './data/mapIcons'
-import { defaultZoomRangeFor } from './utils/visibilityPresets'
+import { defaultZoomRangeFor, canPlaceIconAtZoom, iconPlacementHint } from './utils/visibilityPresets'
 import { DEFAULT_GRID_SIZE, worldSizeOf } from './utils/grid'
+import { TopDownSimpleCRS } from './utils/crs'
+import { subMapIdSet } from './utils/subMap'
 import './LeafletCanvas.css'
-
-// 反转 Simple CRS 的 y 方向: 让 lat=0 在屏幕顶部, lat 越大越往下 (跟屏幕坐标一致)
-// 这样 cell (x=0, y=0) 落在左上, (x=gridSize-1, y=gridSize-1) 落在右下,
-// 增大 gridSize 时新增的格子自然出现在右边和下边
-const TopDownSimpleCRS = L.extend({}, L.CRS.Simple, {
-  transformation: new L.Transformation(1, 0, 1, 0),
-})
 
 function MapBoundsUpdater({ worldSize }) {
   const map = useMap()
@@ -92,7 +88,12 @@ export default function LeafletCanvas() {
   const [pendingIconId, setPendingIconId] = useState(null)
   // 图标正拖到地图上方, 用于给画布加高亮提示
   const [iconDragOver, setIconDragOver] = useState(false)
+  // 当前展开了哪个标记的子地图 (点图标 →「展开地图」)
+  const [subMapMarkerId, setSubMapMarkerId] = useState(null)
+  // 开窗那一刻地图画布在屏幕上的位置, 用来让子地图窗口正好盖住地图编辑区
+  const [subMapRect, setSubMapRect] = useState(null)
   const fileInputRef = useRef(null)
+  const wrapRef = useRef(null)
   const {
     novelId,
     world,
@@ -102,6 +103,8 @@ export default function LeafletCanvas() {
     addLabel,
     updateLabel,
     removeLabel,
+    updateSubMap,
+    resetSubMap,
     replaceAll,
   } = useWorldData()
 
@@ -110,6 +113,16 @@ export default function LeafletCanvas() {
   const cells = demoWorld.cells
   const worldSize = worldSizeOf(gridSize)
   const initialCenter = [worldSize / 2, worldSize / 2]
+
+  // 图标是"大陆 / 国家"级地标, 放大到城市 / 街道层就不许再落点;
+  // 图标栏仍可浏览和选中, 只是要缩回去才放得下, 选中状态不丢
+  const iconPlaceable = canPlaceIconAtZoom(zoom)
+
+  // 已建过子地图的标记 (图标上挂角标) + 当前展开的那个
+  const subMapIds = useMemo(() => subMapIdSet(world.subMaps), [world.subMaps])
+  const subMapMarker = subMapMarkerId
+    ? world.markers.find((m) => m.id === subMapMarkerId) || null
+    : null
 
   const handleRefreshMap = () => {
     setMapVersion((v) => v + 1)
@@ -190,10 +203,16 @@ export default function LeafletCanvas() {
   }
 
   // ---- 从图标栏拖到地图上落点 ----
+  // 子地图浮窗是 portal 到 body 的, 但事件仍沿 React 树冒到这里。
+  // 落在浮窗边框/标题栏上的拖放不该被算成"往世界地图上放", 用 DOM 包含关系筛掉
+  const fromThisCanvas = (e) => Boolean(wrapRef.current?.contains(e.target))
+
   const handleIconDragOver = (e) => {
+    if (!fromThisCanvas(e)) return
     if (!e.dataTransfer.types.includes(ICON_DND_TYPE)) return
     e.preventDefault() // 不阻止默认行为就不会触发 drop
-    e.dataTransfer.dropEffect = 'copy'
+    // 越层时给"禁止"光标, 但仍接管这次拖拽, 好在画布上打出为什么不能放
+    e.dataTransfer.dropEffect = iconPlaceable ? 'copy' : 'none'
     if (!iconDragOver) setIconDragOver(true)
   }
 
@@ -205,10 +224,15 @@ export default function LeafletCanvas() {
 
   // 拖放是"快速落点": 直接用图标名建标记, 不打断为弹表单; 之后点标记可再改名/调可见性
   const handleIconDrop = (e) => {
+    if (!fromThisCanvas(e)) return
     const iconId = e.dataTransfer.getData(ICON_DND_TYPE)
     setIconDragOver(false)
     if (!iconId || !mapInstance) return
     e.preventDefault()
+    if (!iconPlaceable) {
+      message.warning(iconPlacementHint(zoom))
+      return
+    }
     const latlng = mapInstance.mouseEventToLatLng(e.nativeEvent)
     const icon = MAP_ICON_INDEX[iconId]
     // 拖到世界边缘外时收回边界内, 避免落到 maxBounds 之外看不见
@@ -224,6 +248,10 @@ export default function LeafletCanvas() {
 
   const handleMapClick = (e) => {
     if (editMode === 'idle') return
+    if (editMode === 'adding-icon' && !iconPlaceable) {
+      message.warning(iconPlacementHint(zoom))
+      return
+    }
     const coord = [e.latlng.lat, e.latlng.lng]
     const objectType = editMode === 'adding-label' ? 'label' : 'marker'
     setEditorState({
@@ -240,7 +268,7 @@ export default function LeafletCanvas() {
     setPromptCell({ id, cell })
   }
 
-  const handleMarkerClick = (m) => {
+  const handleMarkerEdit = (m) => {
     setEditorState({
       objectType: 'marker',
       mode: 'edit',
@@ -248,6 +276,16 @@ export default function LeafletCanvas() {
       initialValues: m,
       targetId: m.id,
     })
+  }
+
+  // 展开该地点自己的那张地图 (数据在 world.subMaps[m.id])
+  // 顺手量一下画布此刻的屏幕矩形: 窗口按它开, 铺满地图区又不压住左侧菜单
+  const handleMarkerExpand = (m) => {
+    const rect = wrapRef.current?.getBoundingClientRect()
+    setSubMapRect(
+      rect ? { x: rect.left, y: rect.top, w: rect.width, h: rect.height } : null
+    )
+    setSubMapMarkerId(m.id)
   }
 
   const handleLabelClick = (lb) => {
@@ -278,8 +316,13 @@ export default function LeafletCanvas() {
   const handleEditorDelete = () => {
     if (!editorState) return
     const { objectType, targetId } = editorState
-    if (objectType === 'marker') removeMarker(targetId)
-    else removeLabel(targetId)
+    if (objectType === 'marker') {
+      removeMarker(targetId)
+      // 标记连同子地图一起没了, 开着的窗口要跟着关
+      if (subMapMarkerId === targetId) setSubMapMarkerId(null)
+    } else {
+      removeLabel(targetId)
+    }
     setEditorState(null)
   }
 
@@ -324,6 +367,7 @@ export default function LeafletCanvas() {
         labels: parsed.labels?.length || 0,
         regions: parsed.regions?.length || 0,
         routes: parsed.routes?.length || 0,
+        subMaps: Object.keys(parsed.subMaps || {}).length,
       }
       Modal.confirm({
         title: '导入将覆盖当前地图数据',
@@ -335,6 +379,7 @@ export default function LeafletCanvas() {
               <li>{counts.labels} 个标签</li>
               <li>{counts.regions} 个区域</li>
               <li>{counts.routes} 条路径</li>
+              <li>{counts.subMaps} 张子地图</li>
             </ul>
             <p>确认导入并覆盖当前数据吗?</p>
           </div>
@@ -352,14 +397,16 @@ export default function LeafletCanvas() {
   }
 
   const isAdding = editMode !== 'idle'
+  const dropClass = iconDragOver
+    ? iconPlaceable
+      ? ' icon-dropping'
+      : ' icon-dropping-blocked'
+    : ''
 
   return (
     <div
-      className={
-        'leaflet-canvas-wrap' +
-        (isAdding ? ' editing' : '') +
-        (iconDragOver ? ' icon-dropping' : '')
-      }
+      ref={wrapRef}
+      className={'leaflet-canvas-wrap' + (isAdding ? ' editing' : '') + dropClass}
       onDragOver={handleIconDragOver}
       onDragLeave={handleIconDragLeave}
       onDrop={handleIconDrop}
@@ -397,7 +444,9 @@ export default function LeafletCanvas() {
         <WorldMarkers
           markers={world.markers}
           interactive={!isAdding}
-          onMarkerClick={isAdding ? null : handleMarkerClick}
+          subMapIds={subMapIds}
+          onMarkerEdit={isAdding ? null : handleMarkerEdit}
+          onMarkerExpand={isAdding ? null : handleMarkerExpand}
         />
         <WorldLabels
           labels={world.labels}
@@ -420,6 +469,8 @@ export default function LeafletCanvas() {
         onToggleIconPanel={handleToggleIconPanel}
         selectedIconId={pendingIconId}
         onSelectIcon={handleSelectIcon}
+        iconPlaceable={iconPlaceable}
+        currentZoom={zoom}
         onImport={handleImport}
         onExport={handleExport}
         onSync={handleSync}
@@ -448,6 +499,7 @@ export default function LeafletCanvas() {
         mode={editorState?.mode}
         initialValues={editorState?.initialValues}
         currentZoom={zoom}
+        iconPlaceable={iconPlaceable}
         onOk={handleEditorOk}
         onCancel={() => setEditorState(null)}
         onDelete={editorState?.mode === 'edit' ? handleEditorDelete : undefined}
@@ -459,6 +511,16 @@ export default function LeafletCanvas() {
         cell={promptCell?.cell}
         cells={cells}
         onClose={() => setPromptCell(null)}
+      />
+
+      <SubMapWindow
+        open={Boolean(subMapMarker)}
+        marker={subMapMarker}
+        subMap={world.subMaps?.[subMapMarkerId]}
+        anchorRect={subMapRect}
+        onUpdate={(updater) => updateSubMap(subMapMarkerId, updater)}
+        onReset={() => resetSubMap(subMapMarkerId)}
+        onClose={() => setSubMapMarkerId(null)}
       />
     </div>
   )

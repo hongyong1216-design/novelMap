@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Modal, Input, Button, Space, Tag, Tooltip, Typography, message } from 'antd'
-import { CopyOutlined, PictureOutlined, DownloadOutlined } from '@ant-design/icons'
+import { CopyOutlined, PictureOutlined, DownloadOutlined, SaveOutlined, DeleteOutlined } from '@ant-design/icons'
 import { parseCellId } from '../../utils/grid'
 import { buildRefTemplate, filledNeighborsOf, downloadBlob } from '../../utils/refTemplate'
 import { DEFAULT_PROMPT, composePrompt } from './prompts'
@@ -10,13 +10,33 @@ const { Text } = Typography
 
 // 点击格子后的 AI 生图助手弹窗:
 // 默认提示词(可改) + 本格补充提示词 + 复制提示词 + 生成邻居重叠参考图
-export default function CellPromptModal({ open, cellId, cell, cells, onClose }) {
+//
+// 两种登记模式 (提示词 / 参考图部分完全一样):
+//   世界地图 —— 点标题把 IMAGES 条目写进 demoWorld.js (浏览器写不了文件, 由 dev server 代劳)
+//   子地图   —— 传入 onSaveCell 即切到"就地登记": 名称 / 图片路径直接存进这张子地图的数据,
+//               不碰源码也不需要 dev server
+export default function CellPromptModal({
+  open,
+  cellId,
+  cell,
+  cells,
+  defaultSrc,
+  onSaveCell,
+  onClearCell,
+  zIndex,
+  onClose,
+}) {
   const [basePrompt, setBasePrompt] = useState(DEFAULT_PROMPT)
   const [extraPrompt, setExtraPrompt] = useState('')
   const [building, setBuilding] = useState(false)
   const [registering, setRegistering] = useState(false)
   const [preview, setPreview] = useState(null) // { url, blob, neighborCount }
   const previewUrlRef = useRef(null)
+
+  // 就地登记模式下这一格的可编辑字段
+  const localMode = Boolean(onSaveCell)
+  const [nameDraft, setNameDraft] = useState('')
+  const [srcDraft, setSrcDraft] = useState('')
 
   const pos = parseCellId(cellId)
   const neighborCount = pos && cells ? filledNeighborsOf(cells, pos.x, pos.y).length : 0
@@ -36,6 +56,13 @@ export default function CellPromptModal({ open, cellId, cell, cells, onClose }) 
       clearPreview()
     }
   }, [open, cellId])
+
+  // 就地登记模式: 表单跟着当前格子的实际数据走 (保存后弹窗不关, 好接着生成图片)
+  useEffect(() => {
+    if (!open) return
+    setNameDraft(cell?.name || '')
+    setSrcDraft(cell?.src || '')
+  }, [open, cellId, cell?.name, cell?.src])
 
   useEffect(() => () => clearPreview(), [])
 
@@ -75,7 +102,7 @@ export default function CellPromptModal({ open, cellId, cell, cells, onClose }) 
   }
 
   // 点标题即把这一格的 IMAGES 条目写进 demoWorld.js (浏览器写不了文件, 由 dev server 代劳)
-  const imageSrc = cell?.src || `/maps/${cellId}.jpeg`
+  const imageSrc = cell?.src || defaultSrc || `/maps/${cellId}.jpeg`
   const imageEntry = `'${cellId}': '${imageSrc}',`
 
   const handleRegisterEntry = async () => {
@@ -111,18 +138,38 @@ export default function CellPromptModal({ open, cellId, cell, cells, onClose }) 
     }
   }
 
+  // 就地登记 (子地图): 直接写进这张图的数据, 不动源码
+  const handleSaveCell = () => {
+    const name = nameDraft.trim()
+    if (!name) {
+      message.warning('请先填写这一格的名称')
+      return
+    }
+    onSaveCell({ name, src: srcDraft.trim() })
+    message.success(`已登记 ${cellId}`)
+  }
+
+  const handleClearCell = () => {
+    onClearCell?.()
+    onClose()
+  }
+
   return (
     <Modal
       title={
         <Space size={8}>
-          <Tooltip title={`点击写入 demoWorld.js: ${imageEntry}`}>
-            <span
-              className={`cell-prompt-modal__entry${registering ? ' is-busy' : ''}`}
-              onClick={handleRegisterEntry}
-            >
-              {cell?.name || cellId}
-            </span>
-          </Tooltip>
+          {localMode ? (
+            <span>{cell?.name || cellId}</span>
+          ) : (
+            <Tooltip title={`点击写入 demoWorld.js: ${imageEntry}`}>
+              <span
+                className={`cell-prompt-modal__entry${registering ? ' is-busy' : ''}`}
+                onClick={handleRegisterEntry}
+              >
+                {cell?.name || cellId}
+              </span>
+            </Tooltip>
+          )}
           <Tag>{cellId}</Tag>
           <Tag color={cell?.src ? 'purple' : 'default'}>{cell?.src ? '已有图片' : '未探索'}</Tag>
         </Space>
@@ -131,8 +178,40 @@ export default function CellPromptModal({ open, cellId, cell, cells, onClose }) 
       onCancel={onClose}
       footer={null}
       width={560}
+      zIndex={zIndex}
       destroyOnHidden
     >
+      {localMode && (
+        <div className="cell-prompt-modal__section cell-prompt-modal__cell-form">
+          <Text type="secondary">这一格的名称与图片</Text>
+          <Input
+            value={nameDraft}
+            onChange={(e) => setNameDraft(e.target.value)}
+            placeholder="例:王宫 / 市集 / 城南"
+          />
+          <Input
+            value={srcDraft}
+            onChange={(e) => setSrcDraft(e.target.value)}
+            placeholder={defaultSrc || '/sub-maps/xxx.png'}
+            allowClear
+          />
+          <Space wrap>
+            <Button type="primary" icon={<SaveOutlined />} onClick={handleSaveCell}>
+              保存这一格
+            </Button>
+            {cell?.name || cell?.src ? (
+              <Button danger icon={<DeleteOutlined />} onClick={handleClearCell}>
+                清空该格
+              </Button>
+            ) : null}
+          </Space>
+          <Text type="secondary" className="cell-prompt-modal__note">
+            图片路径留空则只显示名称占位图。把生成好的图放进 public/ 下, 这里填它的 URL
+            (建议就用占位提示里的那条, 一格一个文件名不会撞)。
+          </Text>
+        </div>
+      )}
+
       <div className="cell-prompt-modal__section">
         <Text type="secondary">默认提示词 (可编辑)</Text>
         <Input.TextArea

@@ -8,6 +8,17 @@
   margin-bottom: 10px;
 }
 
+/* 越层新建时顶部的说明条 (图片图标组已被隐藏) */
+.icon-picker__notice {
+  margin-bottom: 8px;
+  padding: 5px 8px;
+  background: rgba(255, 118, 117, 0.12);
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #ff9f9e;
+}
+
 .icon-picker__group:last-child {
   margin-bottom: 0;
 }

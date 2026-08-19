@@ -28,6 +28,9 @@ export default function FloatingModal({
   children,
   defaultWidth = 896,
   defaultHeight = 720,
+  // 给了就按指定位置开窗 (例如"正好盖住某块区域"), 不给则居中
+  defaultX,
+  defaultY,
   className = '',
   bodyClassName = '',
   draggable = true,
@@ -59,10 +62,13 @@ export default function FloatingModal({
     if (typeof window === 'undefined') return
     const vw = window.innerWidth
     const vh = window.innerHeight
-    setSize({ w: defaultWidth, h: defaultHeight })
+    // 尺寸夹回视口内: 调用方要"尽量铺满"时给个偏大的值也不会开出屏幕外
+    const w = Math.min(defaultWidth, vw)
+    const h = Math.min(defaultHeight, vh)
+    setSize({ w, h })
     setPosition({
-      x: Math.max(0, (vw - defaultWidth) / 2),
-      y: Math.max(0, (vh - defaultHeight) / 2),
+      x: clamp(defaultX ?? (vw - w) / 2, 0, Math.max(0, vw - w)),
+      y: clamp(defaultY ?? (vh - h) / 2, 0, Math.max(0, vh - h)),
     })
     setMinimizedPos({
       x: vw - MINIMIZED_BUTTON_SIZE - 24,

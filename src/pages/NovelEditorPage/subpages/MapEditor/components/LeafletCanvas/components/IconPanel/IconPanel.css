@@ -71,3 +71,8 @@
   line-height: 1.6;
   color: var(--text-secondary, rgba(255, 255, 255, 0.45));
 }
+
+/* 当前层级不允许落点时的说明 */
+.icon-panel__hint--warn {
+  color: #ff9f9e;
+}

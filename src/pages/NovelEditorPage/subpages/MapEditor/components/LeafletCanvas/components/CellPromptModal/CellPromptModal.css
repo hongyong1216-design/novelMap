@@ -30,6 +30,17 @@
   margin-bottom: 14px;
 }
 
+/* 就地登记模式 (子地图) 的名称 / 图片路径表单 */
+.cell-prompt-modal__cell-form {
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cell-prompt-modal__note {
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 .cell-prompt-modal__hint {
   margin-top: 12px;
   font-size: 12px;

@@ -73,6 +73,12 @@ export default function ObjectEditorModal({
   mode = 'create',
   initialValues,
   currentZoom = 0,
+  iconPlaceable = true,
+  // 子地图里不设可见性: 子地图的 zoom 随窗口尺寸自适应, 世界地图那套分档在这儿没有意义,
+  // 对象一律始终可见 (不写 minZoom / maxZoom)
+  showVisibility = true,
+  // 子地图浮窗里打开时要压过浮窗本体 (z-index 1000)
+  zIndex,
   onOk,
   onCancel,
   onDelete,
@@ -81,6 +87,9 @@ export default function ObjectEditorModal({
 
   const titleMap = objectType === 'marker' ? MARKER_TITLE : LABEL_TITLE
   const title = titleMap[mode] || titleMap.create
+
+  // 图片图标只能新建在大陆 / 国家层; 编辑已有标记不受限, 否则越层就改不了它的图标
+  const allowImageIcons = mode === 'edit' || iconPlaceable
 
   const defaults = useMemo(() => {
     const base = valuesToForm(initialValues || {}, currentZoom)
@@ -111,7 +120,9 @@ export default function ObjectEditorModal({
 
   const handleOk = async () => {
     const values = await form.validateFields()
-    const zoomRange = formToZoomRange(values.preset, values.customRange)
+    const zoomRange = showVisibility
+      ? formToZoomRange(values.preset, values.customRange)
+      : {}
     const payload =
       objectType === 'marker'
         ? {
@@ -136,6 +147,7 @@ export default function ObjectEditorModal({
       okText={mode === 'edit' ? '保存' : '添加'}
       cancelText="取消"
       width={460}
+      zIndex={zIndex}
       destroyOnClose
       footer={(_, { OkBtn, CancelBtn }) => (
         <div className="object-editor-modal__footer">
@@ -153,9 +165,11 @@ export default function ObjectEditorModal({
     >
       <div className="object-editor-modal__zoom-hint">
         当前缩放: <b>{currentZoom.toFixed(2)}</b>
-        <span className="object-editor-modal__tier">
-          {zoomTierName(currentZoom)}
-        </span>
+        {showVisibility && (
+          <span className="object-editor-modal__tier">
+            {zoomTierName(currentZoom)}
+          </span>
+        )}
       </div>
 
       <Form form={form} layout="vertical" initialValues={defaults} preserve={false}>
@@ -169,7 +183,7 @@ export default function ObjectEditorModal({
               <Input placeholder="例如:王都洛城" autoFocus />
             </Form.Item>
             <Form.Item label="图标" name="iconId">
-              <IconPicker />
+              <IconPicker allowImageIcons={allowImageIcons} />
             </Form.Item>
           </>
         ) : (
@@ -187,7 +201,7 @@ export default function ObjectEditorModal({
           </>
         )}
 
-        <Form.Item label="可见性" name="preset">
+        <Form.Item label="可见性" name="preset" hidden={!showVisibility}>
           <Select options={PRESET_OPTIONS} />
         </Form.Item>
 
@@ -196,7 +210,7 @@ export default function ObjectEditorModal({
           noStyle
         >
           {({ getFieldValue }) =>
-            getFieldValue('preset') === 'custom' && (
+            showVisibility && getFieldValue('preset') === 'custom' && (
               <Form.Item
                 label={`自定义可见区间 (zoom ${MIN_ZOOM} ~ ${MAX_ZOOM})`}
                 name="customRange"

@@ -31,13 +31,24 @@ export const VISIBILITY_PRESETS = [
   },
 ]
 
+// 图标放置的层级上限: 只允许「大陆 / 总览」与「国家 / 大区」两层。
+// 数值与 zoomTierName 的第二档边界共用, 避免两处分档漂移。
+export const ICON_PLACEMENT_MAX_ZOOM = 2
+
 // zoom → 语义层级名 (供 ZoomHUD 显示)
 export const zoomTierName = (zoom) => {
   if (zoom < -1) return '大陆 / 总览'
-  if (zoom < 2) return '国家 / 大区'
+  if (zoom < ICON_PLACEMENT_MAX_ZOOM) return '国家 / 大区'
   if (zoom < 4) return '城市 / 街区'
   return '街道 / 建筑'
 }
+
+// 当前 zoom 能否放置图标 (城市 / 街道层禁止, 那两层的地标请用「标记」工具)
+export const canPlaceIconAtZoom = (zoom) => zoom < ICON_PLACEMENT_MAX_ZOOM
+
+// 越层放置时的统一提示语, 带上当前层级名方便用户判断要缩多少
+export const iconPlacementHint = (zoom) =>
+  `图标只能添加到大陆 / 国家层, 当前是「${zoomTierName(zoom)}」层, 请先缩小地图`
 
 // 当前 zoom → 推荐预设 id (添加标签时智能预选)
 export const recommendPresetForZoom = (zoom) => {

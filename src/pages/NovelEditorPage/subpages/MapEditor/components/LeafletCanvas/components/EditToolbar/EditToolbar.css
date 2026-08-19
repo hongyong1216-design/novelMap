@@ -53,6 +53,13 @@
   gap: 8px;
 }
 
+/* 越层放图标时的拒绝态提示 */
+.edit-toolbar__hint--warn {
+  background: rgba(255, 118, 117, 0.14);
+  border-color: rgba(255, 118, 117, 0.45);
+  color: #ff9f9e;
+}
+
 /* 编辑模式下地图光标变十字 */
 .leaflet-canvas-wrap.editing .leaflet-container,
 .leaflet-canvas-wrap.editing .leaflet-interactive {

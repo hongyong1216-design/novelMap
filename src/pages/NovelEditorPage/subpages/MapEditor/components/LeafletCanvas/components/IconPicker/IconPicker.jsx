@@ -3,10 +3,21 @@ import IconVisual from '../IconVisual/IconVisual'
 import '../IconVisual/IconVisual.css'
 import './IconPicker.css'
 
-export default function IconPicker({ value, onChange }) {
+// allowImageIcons=false: 当前层级不许新建图片图标 (只能加在大陆 / 国家层),
+// 图片组整组隐藏, 色点 / emoji 不受影响
+export default function IconPicker({ value, onChange, allowImageIcons = true }) {
+  const groups = allowImageIcons
+    ? ICON_GROUPS
+    : ICON_GROUPS.filter((g) => !g.image)
+
   return (
     <div className="icon-picker">
-      {ICON_GROUPS.map((g) => (
+      {!allowImageIcons && (
+        <div className="icon-picker__notice">
+          图片图标只能加在大陆 / 国家层, 缩小地图后可选
+        </div>
+      )}
+      {groups.map((g) => (
         <div key={g.id} className="icon-picker__group">
           <div className="icon-picker__group-label">{g.group}</div>
           <div className="icon-picker__grid">

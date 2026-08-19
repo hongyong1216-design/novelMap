@@ -24,6 +24,26 @@
   pointer-events: none; /* 不能挡住 drop 事件 */
 }
 
+/* 放大过了大陆 / 国家层: 同样的提示条改成拒绝态 */
+.leaflet-canvas-wrap.icon-dropping-blocked::after {
+  content: '此层不能放置图标 — 请缩小到大陆 / 国家层';
+  position: absolute;
+  inset: 0;
+  z-index: 450;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 40px;
+  box-shadow: inset 0 0 0 2px rgba(255, 118, 117, 0.65);
+  background: rgba(255, 118, 117, 0.06);
+  color: #ff9f9e;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
 .leaflet-canvas {
   width: 100%;
   height: 100%;
@@ -127,6 +147,26 @@
   line-height: 1;
 }
 
+/* 图标 / emoji / 色点的外壳: 收缩到图形本身宽度, 好让子地图角标贴住右上角 */
+.novelmap-marker__visual {
+  position: relative;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+/* 已有子地图的角标 */
+.novelmap-marker__submap-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #a29bfe;
+  border: 2px solid rgba(12, 12, 29, 0.9);
+  box-shadow: 0 0 6px rgba(162, 155, 254, 0.9);
+}
+
 .novelmap-marker__label {
   margin-top: 4px;
   text-align: center;
@@ -136,6 +176,68 @@
   white-space: nowrap;
   font-weight: 600;
   letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   点图标弹出的两项菜单 (编辑标记 / 展开地图)
+   Leaflet 默认气泡是白底, 这里整体改成与工具栏同款的暗色浮层
+   ============================================================ */
+.novelmap-marker-menu .leaflet-popup-content-wrapper {
+  padding: 0;
+  background: rgba(20, 20, 38, 0.94);
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  color: var(--text-primary);
+}
+
+.novelmap-marker-menu .leaflet-popup-content {
+  margin: 0;
+  width: auto !important;
+  line-height: 1.5;
+}
+
+.novelmap-marker-menu .leaflet-popup-tip {
+  background: rgba(20, 20, 38, 0.94);
+  box-shadow: none;
+}
+
+.novelmap-marker-menu__body {
+  padding: 6px;
+  min-width: 132px;
+}
+
+.novelmap-marker-menu__title {
+  padding: 2px 8px 6px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: #a29bfe;
+  opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.novelmap-marker-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 8px;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.novelmap-marker-menu__item:hover {
+  background: rgba(108, 92, 231, 0.28);
 }
 
 /* 文字标签层 */

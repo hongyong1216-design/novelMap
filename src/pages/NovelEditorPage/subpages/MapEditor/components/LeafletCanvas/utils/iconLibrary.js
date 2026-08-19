@@ -95,6 +95,7 @@ const BUILTIN_GROUPS = [
 const IMAGE_GROUPS = MAP_ICON_CATEGORIES.map((c) => ({
   id: `img-${c.id}`,
   group: `${c.name} · 图片`,
+  image: true, // 图片图标组: 同样受"只能加在大陆 / 国家层"限制, 越层新建时表单里不展示
   items: c.icons.map((it) => ({ ...it, kind: 'image' })),
 }))
 

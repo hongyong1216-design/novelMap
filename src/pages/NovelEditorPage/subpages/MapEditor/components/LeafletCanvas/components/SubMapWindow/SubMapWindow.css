@@ -1,0 +1,98 @@
+/* 子地图浮窗 (FloatingModal 外壳) + 窗口内的 Leaflet 画布 */
+
+.sub-map-window .floating-modal__title {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+
+.sub-map-canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.sub-map-canvas__map {
+  width: 100%;
+  height: 100%;
+  background: var(--bg-primary);
+  outline: none;
+}
+
+/* 放置模式下光标变十字 */
+.sub-map-canvas.editing .leaflet-container,
+.sub-map-canvas.editing .leaflet-interactive {
+  cursor: crosshair !important;
+}
+
+/* 图标拖进窗口时的落点提示 */
+.sub-map-canvas.icon-dropping::after {
+  content: '松开放置图标';
+  position: absolute;
+  inset: 0;
+  z-index: 450;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 32px;
+  box-shadow: inset 0 0 0 2px rgba(108, 92, 231, 0.7);
+  background: rgba(108, 92, 231, 0.06);
+  color: #a29bfe;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+/* 窗口里没有左侧气候标尺, 工具栏可以贴得更靠边 */
+.sub-map-canvas .edit-toolbar--sub {
+  top: 12px;
+  left: 12px;
+}
+
+/* 右上角设置面板: 网格规模 + 清空 */
+.sub-map-canvas__panel {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 10px 12px;
+  background: rgba(20, 20, 38, 0.88);
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  color: var(--text-primary);
+  user-select: none;
+}
+
+.sub-map-canvas__panel-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sub-map-canvas__panel-label {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: #a29bfe;
+  opacity: 0.85;
+}
+
+.sub-map-canvas__panel-suffix {
+  font-size: 12px;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.5));
+}
+
+.sub-map-canvas__panel-hint {
+  max-width: 168px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.45));
+}

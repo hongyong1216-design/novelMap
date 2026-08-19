@@ -1,0 +1,91 @@
+.node-modal .ant-modal-body {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.node-modal .ant-modal-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.node-modal .ant-modal-body::-webkit-scrollbar-thumb {
+  background-color: #434656;
+  border-radius: 2px;
+}
+
+/* ---------- 底部按钮 ---------- */
+
+/* 删除留在最左，「关闭 / 编辑」照旧靠右；按钮间距沿用 antd 自己的 margin，不额外加 gap */
+.node-modal .ant-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.node-modal__delete-btn {
+  margin-right: auto;
+}
+
+/* ---------- 查看态 ---------- */
+
+.node-modal__view {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+}
+
+.node-modal__act {
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  color: #b5c4ff;
+}
+
+.node-modal__title {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e1e1ef;
+  margin: 0;
+}
+
+.node-modal__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.node-modal__tag {
+  padding: 0.125rem 0.5rem;
+  background-color: rgba(0, 90, 255, 0.12);
+  border: 1px solid rgba(0, 90, 255, 0.25);
+  border-radius: 0.25rem;
+  font-size: 0.6875rem;
+  color: #b5c4ff;
+}
+
+.node-modal__desc {
+  margin: 0.25rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(67, 70, 86, 0.3);
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 0.9375rem;
+  line-height: 1.9;
+  color: #c3c5d9;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.node-modal__desc--empty {
+  color: #8d90a2;
+  font-style: italic;
+}
+
+/* ---------- 编辑态 ---------- */
+
+.node-modal__form {
+  padding-top: 0.25rem;
+}
+
+.node-modal__form .ant-form-item:last-child {
+  margin-bottom: 0;
+}

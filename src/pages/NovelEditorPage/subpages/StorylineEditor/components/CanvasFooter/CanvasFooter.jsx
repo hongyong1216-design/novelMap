@@ -12,7 +12,7 @@ export default function CanvasFooter({
         <div className="canvas-footer__progress">
           <div
             className="canvas-footer__progress-bar"
-            style={{ width: `${zoom}%` }}
+            style={{ width: `${Math.min(100, Math.max(0, zoom))}%` }}
           />
         </div>
       </div>
