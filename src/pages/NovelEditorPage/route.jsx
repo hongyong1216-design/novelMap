@@ -6,6 +6,7 @@ import backgroundRoute from './subpages/StoryBackground/route'
 import mapRoute from './subpages/MapEditor/route'
 import factionRoute from './subpages/FactionEditor/route'
 import characterRoute from './subpages/CharacterProfile/route'
+import namingRoute from './subpages/NamingLexicon/route'
 import storylineRoute from './subpages/StorylineEditor/route'
 import abilityRoute from './subpages/AbilityTree/route'
 
@@ -20,6 +21,7 @@ export default {
     mapRoute,
     factionRoute,
     characterRoute,
+    namingRoute,
     storylineRoute,
     abilityRoute,
   ],

@@ -9,6 +9,7 @@ import {
   TeamOutlined,
   BranchesOutlined,
   DeploymentUnitOutlined,
+  FontColorsOutlined,
 } from '@ant-design/icons'
 import './SideMenu.css'
 
@@ -20,6 +21,7 @@ const items = [
   { key: 'map', icon: <GlobalOutlined />, label: '地图编辑' },
   { key: 'factions', icon: <ApartmentOutlined />, label: '势力编辑' },
   { key: 'characters', icon: <TeamOutlined />, label: '角色档案' },
+  { key: 'naming', icon: <FontColorsOutlined />, label: '命名库' },
   { key: 'storyline', icon: <BranchesOutlined />, label: '故事线' },
 ]
 

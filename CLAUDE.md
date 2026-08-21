@@ -76,6 +76,13 @@ src/
 │           │               └── demoWorld.js      # 网格定义 + cells + 对象数据
 │           ├── FactionEditor/        # 势力编辑页
 │           ├── CharacterProfile/     # 角色档案页
+│           ├── NamingLexicon/        # 命名库（取名工具）
+│           │   ├── index.jsx         # 左铸名台 + 右语素库
+│           │   ├── data/
+│           │   │   ├── morphemes.js  # 语素表（中式/西式/祝福/古语词根）
+│           │   │   └── formulas.js   # 组名公式（物种/称号/地名）
+│           │   ├── utils/generate.js # 抽取与锁定逻辑
+│           │   └── components/       # NameForge / NameCard / MorphemeLibrary
 │           └── StorylineEditor/      # 故事线编辑页
 │
 ├── components/                       # 跨页面通用组件
@@ -102,9 +109,13 @@ src/
 | `/` | HomePage |
 | `/editor/:novelId` | NovelEditorPage（重定向到 `content`） |
 | `/editor/:novelId/content` | ContentEditor |
+| `/editor/:novelId/items` | ItemLexicon |
+| `/editor/:novelId/background` | StoryBackground |
+| `/editor/:novelId/abilities` | AbilityTree |
 | `/editor/:novelId/map` | MapEditor |
 | `/editor/:novelId/factions` | FactionEditor |
 | `/editor/:novelId/characters` | CharacterProfile |
+| `/editor/:novelId/naming` | NamingLexicon |
 | `/editor/:novelId/storyline` | StorylineEditor |
 
 ---

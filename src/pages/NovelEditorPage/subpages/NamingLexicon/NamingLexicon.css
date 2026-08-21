@@ -1,0 +1,176 @@
+/* 工作台式布局：整页不滚，页头与左侧铸名台钉住，只有右侧语素库滚动 */
+.nlex {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.nlex__bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.25;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.nlex > *:not(.nlex__bg-grid) {
+  position: relative;
+  z-index: 1;
+}
+
+/* === Header === */
+.nlex__header {
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 2.5rem 3rem 1.5rem;
+}
+
+.nlex__eyebrow {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent-light);
+}
+
+.nlex__title {
+  margin: 0.35rem 0 0.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.nlex__subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.nlex__stats {
+  display: flex;
+  gap: 1.75rem;
+  margin: 0;
+}
+
+.nlex__stats dt {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.nlex__stats dd {
+  margin: 0.15rem 0 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.4rem;
+  line-height: 1.1;
+  color: var(--accent-light);
+}
+
+/* === 主体：左工作台 + 右语素库，各自独立滚动 === */
+.nlex__body {
+  display: grid;
+  grid-template-columns: 420px minmax(0, 1fr);
+  gap: 1.75rem;
+  flex: 1;
+  /* 不写这行的话 grid 子项会被内容撑高，滚动落回外层 */
+  min-height: 0;
+  padding: 0 3rem;
+}
+
+/* 铸名台钉在原地；内容比视口高时它自己滚，不带动右边 */
+.nlex__side {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  /* grid 项默认 min-height:auto，会被内容顶开导致滚动落回外层 */
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto;
+  padding-bottom: 2.5rem;
+  /* 滚动条不要压着卡片圆角 */
+  padding-right: 0.25rem;
+}
+
+.nlex__library {
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto;
+  padding-bottom: 2.5rem;
+  padding-right: 0.25rem;
+}
+
+.nlex__tabs {
+  min-height: 0;
+}
+
+.nlex__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.6rem;
+}
+
+.nlex__roster-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.nlex__empty {
+  margin: 1.5rem 0;
+}
+
+/* 窄屏堆成一列，钉住就没意义了，交回整页滚动 */
+@media (max-width: 1180px) {
+  .nlex {
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+
+  .nlex__body {
+    display: block;
+    padding-bottom: 3rem;
+  }
+
+  .nlex__side,
+  .nlex__library {
+    height: auto;
+    overflow: visible;
+    padding-right: 0;
+    padding-bottom: 0;
+  }
+
+  .nlex__side {
+    margin-bottom: 1.75rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .nlex__header {
+    padding: 1.5rem 1.25rem 1rem;
+  }
+
+  .nlex__body {
+    padding: 0 1.25rem 3rem;
+  }
+
+  .nlex__stats {
+    gap: 1.25rem;
+  }
+}

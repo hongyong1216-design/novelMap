@@ -1,0 +1,101 @@
+.ncard {
+  position: relative;
+  padding: 0.85rem 0.9rem 0.75rem;
+  border-radius: 4px;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+
+.ncard:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-light) 35%, transparent);
+}
+
+.ncard:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--accent-light);
+}
+
+.ncard.is-active {
+  background: color-mix(in srgb, var(--accent) 22%, var(--bg-card));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-light) 55%, transparent);
+}
+
+/* === 右上角动作条：默认淡出，hover 卡片才显形 === */
+.ncard__tools {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  display: flex;
+  gap: 0.1rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.ncard:hover .ncard__tools,
+.ncard:focus-within .ncard__tools {
+  opacity: 1;
+}
+
+.ncard__tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.ncard__tool:hover {
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--accent-light) 18%, transparent);
+}
+
+/* 已收藏时常驻显示，否则看不出哪些进了名册 */
+.ncard__tool.is-on {
+  color: #ff7a92;
+  opacity: 1;
+}
+
+.ncard:has(.ncard__tool.is-on) .ncard__tools {
+  opacity: 1;
+}
+
+.ncard__text {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+
+.ncard__pinyin {
+  margin: 0.1rem 0 0.35rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.ncard__gloss {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+.ncard__tag {
+  display: inline-block;
+  padding: 0.05rem 0.4rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  color: var(--accent-light);
+}
